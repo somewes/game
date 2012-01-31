@@ -6,9 +6,10 @@ Ext.define('Game.game.Game', {
 		context: null,
 		targetFps: 60,
 		actualFps: 0,
-		width: 600,
-		height: 400,
-		deviceInput: null
+		width: 800,
+		height: 600,
+		deviceInput: null,
+		camera: null
 	},
 	
 	frameCount: 0,
@@ -25,12 +26,27 @@ Ext.define('Game.game.Game', {
 	},
 	
 	init: function() {
-		this.getCanvas().setWidth(this.getWidth());
-		this.getCanvas().setHeight(this.getHeight());
-		this.setContext(this.getCanvas().getEl().dom.getContext('2d'));
+		this.initCanvas();
+		this.initCamera();
+//		this.context.scale(1.4, 1.4);
 		this.initDeviceInput();
 		this.initSprites();
 		this.initGameLoop();
+	},
+	
+	initCanvas: function() {
+		this.getCanvas().setWidth(this.getWidth());
+		this.getCanvas().setHeight(this.getHeight());
+		this.setContext(this.getCanvas().getEl().dom.getContext('2d'));
+	},
+	
+	initCamera: function() {
+		this.setCamera(Ext.create('Game.Camera', {
+			width: this.getWidth(),
+			height: this.getHeight()
+		}));
+		this.getCamera().initGame(this);
+		window.camera = this.getCamera();
 	},
 	
 	initDeviceInput: function() {
@@ -39,16 +55,12 @@ Ext.define('Game.game.Game', {
 		}));
 	},
 	
-	makeRandomSprite: function() {
-		return Ext.create('Game.sprite.Sprite', {
-			
-		});
-	},
-	
 	initSprites: function() {
-		var num = 24;
+		var num = 99;
 		for (var i = 0; i < num; i++) {
-			this.addSprite(Ext.create('Game.sprite.Sprite'));
+			this.addSprite(Ext.create('Game.sprite.Sprite', {
+				randomize: true
+			}));
 		}
 		var player = Ext.create('Game.sprite.Sprite', {
 			x: 0,
@@ -78,11 +90,12 @@ Ext.define('Game.game.Game', {
 	},
 	
 	updateGame: function() {
-		this.context.clearRect(0, 0, this.width, this.height);
+		this.camera.clear();
 		this.getUserInput();
 		this.handleUserInput();
 		this.updatePositions();
 		this.draw();
+		this.camera.restore();
 		this.frameCount++;
 	},
 	
@@ -101,12 +114,22 @@ Ext.define('Game.game.Game', {
 		
 		// sort by width
 		this.sprites.sort(this.sortByY);
+		
+		this.camera.updatePosition(currentTime);
 	},
 	sortByY: function(a, b) {
 		return a.y - b.y;
 	},
 	
 	draw: function() {
+		// draw random bg boxes
+		for (var i = 0; i < 9; i++) {
+			for (var j = 0; j < 9; j++) {
+				this.context.fillStyle = '#' + i + j + j + i + j + j;
+				this.context.fillRect(100*i, 100*j, 100, 100);
+			}
+		}
+		
 		var numSprites = this.sprites.length;
 		for (var i = 0; i < numSprites; i++) {
 			this.sprites[i].draw();

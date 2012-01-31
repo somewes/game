@@ -16,7 +16,8 @@ Ext.define('Game.sprite.Sprite', {
 		deviceInput: null,
 		animation: null,
 		isAnimating: false,
-		color: '#FF0000'
+		color: '#FF0000',
+		randomize: false
 	},
 	
 	constructor: function(config) {
@@ -26,12 +27,14 @@ Ext.define('Game.sprite.Sprite', {
 	},
 
 	init: function() {
-		this.randomize();
+		if (this.randomize) {
+			this.randomizeProperties();
+		}
 	},
 	
-	randomize: function() {
-		this.x = this.randy(0, 400);
-		this.y = this.randy(0, 200);
+	randomizeProperties: function() {
+		this.x = this.randy(0, 1000);
+		this.y = this.randy(0, 800);
 		this.width = this.randy(10, 60);
 		this.height = this.randy(10, 60);
 	},
@@ -51,7 +54,7 @@ Ext.define('Game.sprite.Sprite', {
 	
 	doRandomAnimation: function() {
 		this.color = this.getRandomHex();
-		this.animate(this.randy(0, 400), this.randy(0, 400), this.randy(500, 5000), this.doRandomAnimation, this);
+		this.animate(this.randy(0, 1000), this.randy(0, 800), this.randy(500, 5000), this.doRandomAnimation, this);
 	},
 	
 	initGame: function(game) {
@@ -62,7 +65,9 @@ Ext.define('Game.sprite.Sprite', {
 			this.initDeviceListeners();
 		}
 		this.fireEvent('init', this);
-		this.doRandomAnimation();
+		if (this.randomize) {
+			this.doRandomAnimation();
+		}
 	},
 	
 	animate: function(x, y, duration, callback, scope) {
@@ -115,7 +120,9 @@ Ext.define('Game.sprite.Sprite', {
 	},
 	
 	onKeyDownSpace: function() {
-		this.game.addSprite(this.game.makeRandomSprite());
+		this.game.addSprite(Ext.create('Game.sprite.Sprite', {
+			randomize: true
+		}));
 	},
 	
 	onKeyUpSpace: function() {
