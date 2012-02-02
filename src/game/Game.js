@@ -14,21 +14,18 @@ Ext.define('Game.game.Game', {
 	
 	frameCount: 0,
 	sprites: null,
-	animations: null,
 	ignoreUserInput: false,
 	
 	constructor: function(config) {
 		this.initConfig(config);
 		this.callParent(arguments);
 		this.sprites = [];
-		this.animations = [];
 		this.getCanvas().on('afterrender', this.init, this);
 	},
 	
 	init: function() {
 		this.initCanvas();
 		this.initCamera();
-//		this.context.scale(1.4, 1.4);
 		this.initDeviceInput();
 		this.initSprites();
 		this.initGameLoop();
@@ -56,20 +53,28 @@ Ext.define('Game.game.Game', {
 	},
 	
 	initSprites: function() {
-		var num = 99;
+		var num = 9;
 		for (var i = 0; i < num; i++) {
-			this.addSprite(Ext.create('Game.sprite.Sprite', {
+			this.addSprite(Ext.create('Game.sprite.Base', {
 				randomize: true
 			}));
 		}
 		var player = Ext.create('Game.sprite.Sprite', {
 			x: 0,
 			y: 0,
-			width: 10,
-			height: 10,
-			acceptInput: true
+			width: 32,
+			height: 48,
+			acceptInput: true,
+//			randomize: true
+			src: '/modules/wes/img/sprites/players/mog.png'
 		});
+		player.on('load', function(sprite) {
+			console.log('player loaded ' + sprite.src);
+		}, this);
+		
 		this.addSprite(player);
+		this.getCamera().follow(player);
+		this.getCamera().follow(this.sprites[0]);
 	},
 	
 	addSprite: function(sprite) {
@@ -102,9 +107,11 @@ Ext.define('Game.game.Game', {
 	getUserInput: function() {
 		
 	},
+	
 	handleUserInput: function() {
 		
 	},
+	
 	updatePositions: function() {
 		var currentTime = new Date();
 		var numSprites = this.sprites.length;
@@ -117,6 +124,7 @@ Ext.define('Game.game.Game', {
 		
 		this.camera.updatePosition(currentTime);
 	},
+	
 	sortByY: function(a, b) {
 		return a.y - b.y;
 	},
@@ -126,7 +134,7 @@ Ext.define('Game.game.Game', {
 		for (var i = 0; i < 9; i++) {
 			for (var j = 0; j < 9; j++) {
 				this.context.fillStyle = '#' + i + j + j + i + j + j;
-				this.context.fillRect(100*i, 100*j, 100, 100);
+				this.context.fillRect(100*i, 100*j, 101, 101);
 			}
 		}
 		

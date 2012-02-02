@@ -1,131 +1,75 @@
 Ext.define('Game.sprite.Sprite', {
-	extend: 'Ext.util.Observable',
-	requires: [
-//		'Redokes.sprite.Animation'
-	],
+	extend: 'Game.sprite.Base',
 	
 	config: {
-		game: null,
-		context: null,
-		hidden: false,
-		x: 0,
-		y: 0,
-		width: 0,
-		height: 0,
-		acceptInput: false,
-		deviceInput: null,
-		animation: null,
-		isAnimating: false,
-		color: '#FF0000',
-		randomize: false
+		img: null,
+		src: false,
+		hidden: false
 	},
 	
-	constructor: function(config) {
-		this.initConfig(config);
+	constructor: function() {
 		this.callParent(arguments);
-		this.init();
+		
+		this.img = Ext.get(new Image());
+		this.img.dom.width = this.width;
+		this.img.dom.height = this.height;
+		this.img.on('load', function() {
+			this.load(this.src);
+		}, this);
+		this.load(this.src);
 	},
-
-	init: function() {
-		if (this.randomize) {
-			this.randomizeProperties();
+	
+	load: function(src) {
+		if (src) {
+			this.src = src;
+			this.img.dom.src = src;
 		}
 	},
 	
-	randomizeProperties: function() {
-		this.x = this.randy(0, 1000);
-		this.y = this.randy(0, 800);
-		this.width = this.randy(10, 60);
-		this.height = this.randy(10, 60);
-	},
-	
-	randy: function(min, max) {
-		return Math.random() * (max - min) + min;
-	},
-	
-	getRandomHex: function() {
-		var letters = '0123456789ABCDEF'.split('');
-		var color = '#';
-		for (var i = 0; i < 6; i++ ) {
-			color += letters[Math.round(Math.random() * 15)];
-		}
-		return color;
-	},
-	
-	doRandomAnimation: function() {
-		this.color = this.getRandomHex();
-		this.animate(this.randy(0, 1000), this.randy(0, 800), this.randy(500, 5000), this.doRandomAnimation, this);
-	},
-	
-	initGame: function(game) {
-		this.setGame(game);
-		this.setContext(game.getContext());
-		if (this.getAcceptInput()) {
-			this.setDeviceInput(game.getDeviceInput());
-			this.initDeviceListeners();
-		}
-		this.fireEvent('init', this);
-		if (this.randomize) {
-			this.doRandomAnimation();
-		}
-	},
-	
-	animate: function(x, y, duration, callback, scope) {
-		if (this.animation && this.animation.isRunning) {
-			this.animation.stop();
-		}
-		this.animation = Ext.create('Game.Animation', {
-			sprite: this,
-			stopX: x,
-			stopY: y,
-			duration: duration,
-			callback: callback,
-			scope: scope
-		});
-	},
-	
-	initDeviceListeners: function() {
-		this.getDeviceInput().on('keydownspace', this.onKeyDownSpace, this);
-		this.getDeviceInput().on('keyupspace', this.onKeyUpSpace, this);
-		this.getDeviceInput().on('keydownup', this.onKeyDownUp, this);
-		this.getDeviceInput().on('keyupup', this.onKeyUpUp, this);
-		this.getDeviceInput().on('keydownright', this.onKeyDownRight, this);
-		this.getDeviceInput().on('keyupright', this.onKeyUpRight, this);
-		this.getDeviceInput().on('keydowndown', this.onKeyDownDown, this);
-		this.getDeviceInput().on('keyupdown', this.onKeyUpDown, this);
-		this.getDeviceInput().on('keydownleft', this.onKeyDownLeft, this);
-		this.getDeviceInput().on('keyupleft', this.onKeyUpLeft, this);
-	},
-	
-	hide: function() {
-		this.hidden = true;
-	},
-	
-	show: function() {
+	onLoad: function() {
 		this.hidden = false;
-	},
-	
-	updatePosition: function(currentTime) {
-		if (this.isAnimating) {
-			this.animation.updatePosition(currentTime);
-		}
+		this.fireEvent('load', this);
 	},
 	
 	draw: function() {
 		if (!this.hidden) {
 			var context = this.getContext();
-			context.fillStyle = this.color;
-			context.fillRect(this.x, this.y, this.width, this.height);
+//			this.context.drawImage(this.img.dom, this.getFrame() * this.width, 0, this.width, this.height, this.x, this.y-32, this.width, this.height);
+			this.context.drawImage(this.img.dom, 0, 0, this.width, this.height, this.x, this.y, this.width, this.height);
+			return;
+			if (this.isAnimating) {
+				context.font = '18pt Calibri';
+				context.fillText(this.animation.stopTime.getTime() - this.currentTime.getTime() , this.x, this.y);
+			}
 		}
 	},
 	
-	onKeyDownSpace: function() {
-		this.game.addSprite(Ext.create('Game.sprite.Sprite', {
-			randomize: true
-		}));
+	onKeyDownRight: function(config) {
+		config = config || {};
+		this.animate({
+			duration: config.duration || 500,
+			to: {
+				x: config.x || this.x + 32
+			},
+			on75: function() {
+				return;
+				if (this.deviceInput.keysPressed.right) {
+					Ext.apply(this.animation, {
+						duration: this.animation.remainingTime + 500,
+						to: {
+							x: this.animation.stopX + 32
+						}
+					});
+					this.animation.init();
+				}
+			},
+			onStop: function() {
+				this.onKeyDownRight();
+			}
+		});
 	},
 	
-	onKeyUpSpace: function() {
+	onKeyUpRight: function() {
 		
 	}
 	
