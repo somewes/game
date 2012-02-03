@@ -42,6 +42,7 @@ Ext.define('Game.game.Game', {
 			width: this.getWidth(),
 			height: this.getHeight()
 		}));
+		this.getCamera().setBounds(1000, 1000);
 		this.getCamera().initGame(this);
 		window.camera = this.getCamera();
 	},
@@ -131,8 +132,8 @@ Ext.define('Game.game.Game', {
 	
 	draw: function() {
 		// draw random bg boxes
-		for (var i = 0; i < 9; i++) {
-			for (var j = 0; j < 9; j++) {
+		for (var i = 0; i < 10; i++) {
+			for (var j = 0; j < 10; j++) {
 				this.context.fillStyle = '#' + i + j + j + i + j + j;
 				this.context.fillRect(100*i, 100*j, 101, 101);
 			}

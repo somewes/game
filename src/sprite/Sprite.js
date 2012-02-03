@@ -46,11 +46,15 @@ Ext.define('Game.sprite.Sprite', {
 	
 	onKeyDownRight: function(config) {
 		config = config || {};
+		if (this.animation && this.animation.isRunning) {
+			return;
+		}
 		this.animate({
 			duration: config.duration || 500,
 			to: {
 				x: config.x || this.x + 32
 			},
+			easing: Ext.fx.Easing.ease,
 			on75: function() {
 				return;
 				if (this.deviceInput.keysPressed.right) {

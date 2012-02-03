@@ -13,6 +13,8 @@ Ext.define('Game.sprite.Base', {
 		y: 0,
 		width: 0,
 		height: 0,
+		halfWidth: 0,
+		halfHeight: 0,
 		acceptInput: false,
 		deviceInput: null,
 		animation: null,
@@ -138,7 +140,7 @@ Ext.define('Game.sprite.Base', {
 			context.fillRect(this.x, this.y, this.width, this.height);
 			if (this.animation) {
 				context.font = '18pt Calibri';
-				context.fillText(this.animation.remainingTime , this.x, this.y);
+				context.fillText(this.animation.remainingTime, this.x, this.y);
 			}
 		}
 	},
