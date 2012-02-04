@@ -4,7 +4,8 @@ Ext.define('Game.sprite.Sprite', {
 	config: {
 		img: null,
 		src: false,
-		hidden: false
+		hidden: false,
+		currentFrame: 0
 	},
 	
 	constructor: function() {
@@ -14,7 +15,7 @@ Ext.define('Game.sprite.Sprite', {
 		this.img.dom.width = this.width;
 		this.img.dom.height = this.height;
 		this.img.on('load', function() {
-			this.load(this.src);
+			this.onLoad();
 		}, this);
 		this.load(this.src);
 	},
@@ -27,15 +28,34 @@ Ext.define('Game.sprite.Sprite', {
 	},
 	
 	onLoad: function() {
+		this.playSequence(Ext.create('Game.sprite.Sequence', {
+			sequence: [0]
+		}));
 		this.hidden = false;
 		this.fireEvent('load', this);
+	},
+	
+	updatePosition: function(currentTime) {
+		this.callParent(arguments);
+		
+		// Update the current frame
+		this.currentFrame = this.sequence.getFrame(this.motionElapsedTime, this.getSequenceDurationFactor());
+	},
+	
+	getSequenceDurationFactor: function() {
+		if (this.dx > this.dy) {
+			return Math.round(this.dx/2, 2);
+		}
+		else {
+			return Math.round(this.dy/2, 2);
+		}
 	},
 	
 	draw: function() {
 		if (!this.hidden) {
 			var context = this.getContext();
 //			this.context.drawImage(this.img.dom, this.getFrame() * this.width, 0, this.width, this.height, this.x, this.y-32, this.width, this.height);
-			this.context.drawImage(this.img.dom, this.getFrame() * this.width, 0, this.width, this.height, this.x, this.y, this.width, this.height);
+			this.context.drawImage(this.img.dom, this.currentFrame * this.width, 0, this.width, this.height, this.x, this.y, this.width, this.height);
 			return;
 			if (this.isAnimating) {
 				context.font = '18pt Calibri';
@@ -44,17 +64,19 @@ Ext.define('Game.sprite.Sprite', {
 		}
 	},
 	
-	getFrame: function() {
-		return 0;
-		return this.currentAnimation.sequence[(Math.round(this.game.frameCount / this.currentAnimation.fpf) % this.currentAnimation.sequence.length)];
+	playSequence: function(sequence) {
+		this.sequence = sequence;
 	},
 	
 	onKeyDownRight: function() {
 		this.startMotion({
 			ax: 5,
-			vxMax: 5,
+			vxMax: 3,
 			vxStop: null
 		});
+		this.playSequence(Ext.create('Game.sprite.Sequence', {
+			sequence: [18,3,33,3]
+		}));
 	},
 	
 	onKeyUpRight: function() {
@@ -67,9 +89,12 @@ Ext.define('Game.sprite.Sprite', {
 	onKeyDownLeft: function() {
 		this.startMotion({
 			ax: -5,
-			vxMax: 5,
+			vxMax: 3,
 			vxStop: null
 		});
+		this.playSequence(Ext.create('Game.sprite.Sequence', {
+			sequence: [17,2,32,2]
+		}));
 	},
 	
 	onKeyUpLeft: function() {
@@ -82,9 +107,12 @@ Ext.define('Game.sprite.Sprite', {
 	onKeyDownUp: function() {
 		this.startMotion({
 			ay: -5,
-			vyMax: 5,
+			vyMax: 3,
 			vyStop: null
 		});
+		this.playSequence(Ext.create('Game.sprite.Sequence', {
+			sequence: [16,1,31,1]
+		}));
 	},
 	
 	onKeyUpUp: function() {
@@ -97,9 +125,12 @@ Ext.define('Game.sprite.Sprite', {
 	onKeyDownDown: function() {
 		this.startMotion({
 			ay: 5,
-			vyMax: 5,
+			vyMax: 3,
 			vyStop: null
 		});
+		this.playSequence(Ext.create('Game.sprite.Sequence', {
+			sequence: [15,0,30,0]
+		}));
 	},
 	
 	onKeyUpDown: function() {
