@@ -35,7 +35,7 @@ Ext.define('Game.sprite.Sprite', {
 		if (!this.hidden) {
 			var context = this.getContext();
 //			this.context.drawImage(this.img.dom, this.getFrame() * this.width, 0, this.width, this.height, this.x, this.y-32, this.width, this.height);
-			this.context.drawImage(this.img.dom, 0, 0, this.width, this.height, this.x, this.y, this.width, this.height);
+			this.context.drawImage(this.img.dom, this.getFrame() * this.width, 0, this.width, this.height, this.x, this.y, this.width, this.height);
 			return;
 			if (this.isAnimating) {
 				context.font = '18pt Calibri';
@@ -45,6 +45,7 @@ Ext.define('Game.sprite.Sprite', {
 	},
 	
 	getFrame: function() {
+		return 0;
 		return this.currentAnimation.sequence[(Math.round(this.game.frameCount / this.currentAnimation.fpf) % this.currentAnimation.sequence.length)];
 	},
 	

@@ -42,7 +42,12 @@ Ext.define('Game.game.Game', {
 			width: this.getWidth(),
 			height: this.getHeight()
 		}));
-		this.getCamera().setBounds(null, null, null, null);
+		this.getCamera().setBounds({
+			boundX: 0,
+			boundY: 0,
+			boundX2: 1000,
+			boundY2: 1000
+		});
 		this.getCamera().initGame(this);
 		window.camera = this.getCamera();
 	},

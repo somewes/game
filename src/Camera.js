@@ -11,11 +11,11 @@ Ext.define('Game.Camera', {
 	setBounds: function(config) {
 		Ext.apply(this, config);
 		if (this.boundX !== null) {
-			this.setBoundX(this.boundX + this.width);
+			this.setBoundX(this.boundX);
 		}
 		
 		if (this.boundY !== null) {
-			this.setBoundX(this.boundY + this.height);
+			this.setBoundY(this.boundY);
 		}
 		
 		if (this.boundX2 !== null) {
@@ -36,13 +36,13 @@ Ext.define('Game.Camera', {
 		this.callParent(arguments);
 		
 		if (this.boundX !== null && this.x < this.boundX) {
-			this.x = 0;
+			this.x = this.boundX;
 		}
 		else if (this.boundX2 !== null && this.x > this.boundX2) {
 			this.x = this.boundX2;
 		}
 		if (this.boundY !== null && this.y < this.boundY) {
-			this.y = 0;
+			this.y = this.boundY;
 		}
 		else if (this.boundY2 !== null && this.y > this.boundY2) {
 			this.y = this.boundY2;
