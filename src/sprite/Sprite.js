@@ -44,37 +44,68 @@ Ext.define('Game.sprite.Sprite', {
 		}
 	},
 	
-	onKeyDownRight: function(config) {
-		config = config || {};
-		if (this.animation && this.animation.isRunning) {
-			return;
-		}
-		this.animate({
-			duration: config.duration || 500,
-			to: {
-				x: config.x || this.x + 32
-			},
-			easing: Ext.fx.Easing.ease,
-			on75: function() {
-				return;
-				if (this.deviceInput.keysPressed.right) {
-					Ext.apply(this.animation, {
-						duration: this.animation.remainingTime + 500,
-						to: {
-							x: this.animation.stopX + 32
-						}
-					});
-					this.animation.init();
-				}
-			},
-			onStop: function() {
-				this.onKeyDownRight();
-			}
+	getFrame: function() {
+		return this.currentAnimation.sequence[(Math.round(this.game.frameCount / this.currentAnimation.fpf) % this.currentAnimation.sequence.length)];
+	},
+	
+	onKeyDownRight: function() {
+		this.startMotion({
+			ax: 5,
+			vxMax: 5,
+			vxStop: null
 		});
 	},
 	
 	onKeyUpRight: function() {
-		
+		this.startMotion({
+			ax: -3,
+			vxStop: 0
+		});
+	},
+	
+	onKeyDownLeft: function() {
+		this.startMotion({
+			ax: -5,
+			vxMax: 5,
+			vxStop: null
+		});
+	},
+	
+	onKeyUpLeft: function() {
+		this.startMotion({
+			ax: 3,
+			vxStop: 0
+		});
+	},
+	
+	onKeyDownUp: function() {
+		this.startMotion({
+			ay: -5,
+			vyMax: 5,
+			vyStop: null
+		});
+	},
+	
+	onKeyUpUp: function() {
+		this.startMotion({
+			ay: 3,
+			vyStop: 0
+		});
+	},
+	
+	onKeyDownDown: function() {
+		this.startMotion({
+			ay: 5,
+			vyMax: 5,
+			vyStop: null
+		});
+	},
+	
+	onKeyUpDown: function() {
+		this.startMotion({
+			ay: -3,
+			vyStop: 0
+		});
 	}
 	
 });

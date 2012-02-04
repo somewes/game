@@ -2,15 +2,29 @@ Ext.define('Game.Camera', {
 	extend: 'Game.sprite.Base',
 	
 	config: {
-		boundX: 0,
-		boundY: 0
+		boundX: null,
+		boundY: null,
+		boundX2: null,
+		boundY2: null
 	},
 	
-	setBounds: function(x, y) {
-		this.setBoundX(x - this.width);
-		this.setBoundY(y - this.height);
-		console.log(this.boundX);
-		console.log(this.boundY);
+	setBounds: function(config) {
+		Ext.apply(this, config);
+		if (this.boundX !== null) {
+			this.setBoundX(this.boundX + this.width);
+		}
+		
+		if (this.boundY !== null) {
+			this.setBoundX(this.boundY + this.height);
+		}
+		
+		if (this.boundX2 !== null) {
+			this.setBoundX2(this.boundX2 - this.width);
+		}
+		
+		if (this.boundY2 !== null) {
+			this.setBoundY2(this.boundY2 - this.height);
+		}
 	},
 	
 	clear: function() {
@@ -21,17 +35,17 @@ Ext.define('Game.Camera', {
 	updatePosition: function() {
 		this.callParent(arguments);
 		
-		if (this.x < 0) {
+		if (this.boundX !== null && this.x < this.boundX) {
 			this.x = 0;
 		}
-		else if (this.x > this.boundX) {
-			this.x = this.boundX;
+		else if (this.boundX2 !== null && this.x > this.boundX2) {
+			this.x = this.boundX2;
 		}
-		if (this.y < 0) {
+		if (this.boundY !== null && this.y < this.boundY) {
 			this.y = 0;
 		}
-		else if (this.y > this.boundY) {
-			this.y = this.boundY;
+		else if (this.boundY2 !== null && this.y > this.boundY2) {
+			this.y = this.boundY2;
 		}
 		
 		this.context.translate(-this.x, -this.y);

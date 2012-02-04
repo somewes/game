@@ -42,7 +42,7 @@ Ext.define('Game.game.Game', {
 			width: this.getWidth(),
 			height: this.getHeight()
 		}));
-		this.getCamera().setBounds(1000, 1000);
+		this.getCamera().setBounds(null, null, null, null);
 		this.getCamera().initGame(this);
 		window.camera = this.getCamera();
 	},
@@ -65,17 +65,17 @@ Ext.define('Game.game.Game', {
 			y: 0,
 			width: 32,
 			height: 48,
-			acceptInput: true,
 //			randomize: true
 			src: '/modules/wes/img/sprites/players/mog.png'
 		});
+		player.acceptInput(this.getDeviceInput());
 		player.on('load', function(sprite) {
 			console.log('player loaded ' + sprite.src);
 		}, this);
 		
 		this.addSprite(player);
 		this.getCamera().follow(player);
-		this.getCamera().follow(this.sprites[0]);
+//		this.getCamera().follow(this.sprites[0]);
 	},
 	
 	addSprite: function(sprite) {
@@ -114,7 +114,7 @@ Ext.define('Game.game.Game', {
 	},
 	
 	updatePositions: function() {
-		var currentTime = new Date();
+		var currentTime = (new Date()).getTime();
 		var numSprites = this.sprites.length;
 		for (var i = 0; i < numSprites; i++) {
 			this.sprites[i].updatePosition(currentTime);

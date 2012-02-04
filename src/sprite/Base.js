@@ -1,8 +1,12 @@
 Ext.define('Game.sprite.Base', {
 	extend: 'Ext.util.Observable',
-	
+	mixins: {
+		motion: 'Game.animation.Motion',
+		input: 'Game.input.Listener'
+	},
 	requires: [
-//		'Redokes.sprite.Animation'
+		'Game.animation.Motion',
+		'Game.input.Listener'
 	],
 	
 	config: {
@@ -15,8 +19,6 @@ Ext.define('Game.sprite.Base', {
 		height: 0,
 		halfWidth: 0,
 		halfHeight: 0,
-		acceptInput: false,
-		deviceInput: null,
 		animation: null,
 		color: '#FF0000',
 		randomize: false,
@@ -80,10 +82,6 @@ Ext.define('Game.sprite.Base', {
 	initGame: function(game) {
 		this.setGame(game);
 		this.setContext(game.getContext());
-		if (this.getAcceptInput()) {
-			this.setDeviceInput(game.getDeviceInput());
-			this.initDeviceListeners();
-		}
 		this.fireEvent('init', this);
 		if (this.randomize) {
 			this.doRandomAnimation();
@@ -101,19 +99,6 @@ Ext.define('Game.sprite.Base', {
 		this.animation = Ext.create('Game.Animation', config);
 	},
 	
-	initDeviceListeners: function() {
-		this.getDeviceInput().on('keydownspace', this.onKeyDownSpace, this);
-		this.getDeviceInput().on('keyupspace', this.onKeyUpSpace, this);
-		this.getDeviceInput().on('keydownup', this.onKeyDownUp, this);
-		this.getDeviceInput().on('keyupup', this.onKeyUpUp, this);
-		this.getDeviceInput().on('keydownright', this.onKeyDownRight, this);
-		this.getDeviceInput().on('keyupright', this.onKeyUpRight, this);
-		this.getDeviceInput().on('keydowndown', this.onKeyDownDown, this);
-		this.getDeviceInput().on('keyupdown', this.onKeyUpDown, this);
-		this.getDeviceInput().on('keydownleft', this.onKeyDownLeft, this);
-		this.getDeviceInput().on('keyupleft', this.onKeyUpLeft, this);
-	},
-	
 	hide: function() {
 		this.hidden = true;
 	},
@@ -123,7 +108,10 @@ Ext.define('Game.sprite.Base', {
 	},
 	
 	updatePosition: function(currentTime) {
-		if (this.following) {
+		if (this.isMoving) {
+			this.updateMotionPosition(currentTime);
+		}
+		else if (this.following) {
 			this.x = this.following.x + this.following.halfWidth - this.halfWidth;
 			this.y = this.following.y + this.following.halfHeight - this.halfHeight;
 		}
@@ -143,16 +131,7 @@ Ext.define('Game.sprite.Base', {
 				context.fillText(this.animation.remainingTime, this.x, this.y);
 			}
 		}
-	},
-	
-	onKeyDownSpace: function() {
-		this.game.addSprite(Ext.create('Game.sprite.Base', {
-			randomize: true
-		}));
-	},
-	
-	onKeyUpSpace: function() {
-		
 	}
+	
 	
 });

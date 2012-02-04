@@ -27,7 +27,7 @@ Ext.define('Game.Animation', {
 		stopTime: null,
 		elapsedTime: null,
 		remainingTime: null,
-		isRunning: false
+		isRunning: false,
 	},
 	
 	constructor: function(config) {
@@ -60,8 +60,8 @@ Ext.define('Game.Animation', {
 	
 	start: function() {
 		this.isRunning = true;
-		this.startTime = new Date();
-		this.stopTime = new Date(this.startTime.getTime() + this.duration);
+		this.startTime = (new Date()).getTime();
+		this.stopTime = (new Date(this.startTime + this.duration)).getTime();
 	},
 	
 	cancel: function() {
@@ -86,7 +86,7 @@ Ext.define('Game.Animation', {
 			return;
 		}
 		this.elapsedTime = currentTime - this.startTime;
-		this.remainingTime = this.stopTime.getTime() - currentTime.getTime();
+		this.remainingTime = this.stopTime - currentTime;
 		
 		var percentage = this.elapsedTime / this.duration;
 		
