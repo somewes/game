@@ -13,6 +13,8 @@ Ext.define('Game.animation.Motion', {
 		v0y: 0,
 		vyMax: null,
 		vyStop: null,
+		yStop: null,
+		xStop: null,
 		ax: 0,
 		ay: 0,
 		motionStartTime: null,
@@ -85,7 +87,7 @@ Ext.define('Game.animation.Motion', {
 			this.vx = this.vx > 0 ? this.vxMax : -this.vxMax;
 		}
 		else if (this.vxStop !== null && ((this.ax < 0 && this.vx <= this.vxStop) || (this.ax > 0 && this.vx >= this.vxStop))) {
-			this.vx = 0;
+			this.vx = this.vxStop;
 			this.ax = 0;
 			this.v0x = 0;
 		}
@@ -95,18 +97,25 @@ Ext.define('Game.animation.Motion', {
 			this.vy = this.vy > 0 ? this.vyMax : -this.vyMax;
 		}
 		else if (this.vyStop !== null && ((this.ay < 0 && this.vy <= this.vyStop) || (this.ay > 0 && this.vy >= this.vyStop))) {
-			this.vy = 0;
+			this.vy = this.vyStop;
 			this.ay = 0;
 			this.v0y = 0;
 		}
 		
-		if (this.vx === 0 && this.vy === 0) {
+		if ((this.vx === this.vxStop || this.vx === 0) && (this.vy === this.vyStop || this.vy === 0)) {
 			this.stopMotion();
 		}
 		
 		// Update position
 		this.x += this.vx;
 		this.y += this.vy;
+		
+		if (this.yStop !== null && this.y >= this.yStop) {
+			this.vy = 0;
+			this.ay = 0;
+			this.v0y = 0;
+			this.yStop = null;
+		}
 	}
 	
 });

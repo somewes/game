@@ -10,7 +10,9 @@ Ext.define('Game.sprite.Sprite', {
 	
 	constructor: function() {
 		this.callParent(arguments);
-		
+		this.playSequence(Ext.create('Game.sprite.Sequence', {
+			sequence: [0]
+		}));
 		this.img = Ext.get(new Image());
 		this.img.dom.width = this.width;
 		this.img.dom.height = this.height;
@@ -28,9 +30,6 @@ Ext.define('Game.sprite.Sprite', {
 	},
 	
 	onLoad: function() {
-		this.playSequence(Ext.create('Game.sprite.Sequence', {
-			sequence: [0]
-		}));
 		this.hidden = false;
 		this.fireEvent('load', this);
 	},
@@ -66,6 +65,21 @@ Ext.define('Game.sprite.Sprite', {
 	
 	playSequence: function(sequence) {
 		this.sequence = sequence;
+	},
+	
+	onKeyDownSpace: function() {
+		this.isMoving = false;
+		this.startMotion({
+			ay: 20,
+			vy: -10,
+			vx: 5,
+			ax: -2,
+			vxMax: null,
+			vyMax: null,
+			vxStop: 0,
+			vyStop: null,
+			yStop: this.y
+		});
 	},
 	
 	onKeyDownRight: function() {
