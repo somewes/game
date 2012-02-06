@@ -2,12 +2,14 @@ Ext.define('Game.input.Listener', {
 	extend: 'Ext.util.Observable',
 	
 	config: {
-		inputDevices: []
+		inputDevices: [],
+		inputDevice: null
 	},
 	
 	acceptInput: function(inputDevice) {
 		this.initDeviceListeners(inputDevice);
 		this.inputDevices.push(inputDevice);
+		this.inputDevice = inputDevice;
 	},
 	
 	initDeviceListeners: function(inputDevice) {

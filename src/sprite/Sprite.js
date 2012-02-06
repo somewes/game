@@ -94,10 +94,15 @@ Ext.define('Game.sprite.Sprite', {
 	},
 	
 	onKeyUpRight: function() {
-		this.startMotion({
-			ax: -3,
-			vxStop: 0
-		});
+		if (this.inputDevice.keysPressed.left) {
+			this.onKeyDownLeft();
+		}
+		else {
+			this.startMotion({
+				ax: -3,
+				vxStop: 0
+			});
+		}
 	},
 	
 	onKeyDownLeft: function() {
@@ -112,10 +117,15 @@ Ext.define('Game.sprite.Sprite', {
 	},
 	
 	onKeyUpLeft: function() {
-		this.startMotion({
-			ax: 3,
-			vxStop: 0
-		});
+		if (this.inputDevice.keysPressed.right) {
+			this.onKeyDownRight()
+		}
+		else {
+			this.startMotion({
+				ax: 3,
+				vxStop: 0
+			});
+		}
 	},
 	
 	onKeyDownUp: function() {
@@ -130,10 +140,15 @@ Ext.define('Game.sprite.Sprite', {
 	},
 	
 	onKeyUpUp: function() {
-		this.startMotion({
-			ay: 3,
-			vyStop: 0
-		});
+		if (this.inputDevice.keysPressed.down) {
+			this.onKeyDownDown()
+		}
+		else {
+			this.startMotion({
+				ay: 3,
+				vyStop: 0
+			});
+		}
 	},
 	
 	onKeyDownDown: function() {
@@ -148,10 +163,15 @@ Ext.define('Game.sprite.Sprite', {
 	},
 	
 	onKeyUpDown: function() {
-		this.startMotion({
-			ay: -3,
-			vyStop: 0
-		});
+		if (this.inputDevice.keysPressed.up) {
+			this.onKeyDownUp()
+		}
+		else {
+			this.startMotion({
+				ay: -3,
+				vyStop: 0
+			});
+		}
 	}
 	
 });
