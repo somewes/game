@@ -6,10 +6,11 @@ Ext.define('Game.game.Game', {
 		context: null,
 		targetFps: 60,
 		actualFps: 0,
-		width: 800,
-		height: 600,
+		width: 640,
+		height: 480,
 		deviceInput: null,
-		camera: null
+		camera: null,
+		player: null
 	},
 	
 	frameCount: 0,
@@ -27,7 +28,9 @@ Ext.define('Game.game.Game', {
 		this.initCanvas();
 		this.initCamera();
 		this.initDeviceInput();
-		this.initSprites();
+		this.initPlayer();
+		this.initMap();
+//		this.initSprites();
 		this.initGameLoop();
 	},
 	
@@ -42,12 +45,7 @@ Ext.define('Game.game.Game', {
 			width: this.getWidth(),
 			height: this.getHeight()
 		}));
-		this.getCamera().setBounds({
-			boundX: 0,
-			boundY: 0,
-			boundX2: 1000,
-			boundY2: 1000
-		});
+		
 		this.getCamera().initGame(this);
 		window.camera = this.getCamera();
 	},
@@ -58,6 +56,42 @@ Ext.define('Game.game.Game', {
 		}));
 	},
 	
+	initMap: function() {
+		this.map = Ext.create('Game.map.Map', {
+			tileSheet: '/modules/wes/img/sprites/maps/jidoor/sheet_new.png',
+			game: this
+		});
+	},
+	
+	initPlayer: function() {
+		this.player = Ext.create('Game.sprite.Character', {
+			name: 'Mog',
+			x: 0,
+			y: 0,
+			width: 32,
+			height: 48,
+//			randomize: true,
+			src: '/modules/wes/img/sprites/players/mog.png'
+		});
+		this.player2 = Ext.create('Game.sprite.Character', {
+			name: 'Gogo',
+			x: 0,
+			y: 0,
+			width: 32,
+			height: 48,
+			src: '/modules/wes/img/sprites/players/gogo.png'
+		});
+		
+		this.player.acceptInput(this.getDeviceInput());
+		this.addSprite(this.player2);
+		
+		var sword = Ext.create('Game.gear.Sword');
+		this.player.equip(sword, 'rightHand');
+		this.player.attack(this.player2);
+		this.player.attack(this.player2);
+		this.player.attack(this.player2);
+	},
+	
 	initSprites: function() {
 		var num = 9;
 		for (var i = 0; i < num; i++) {
@@ -65,21 +99,6 @@ Ext.define('Game.game.Game', {
 				randomize: true
 			}));
 		}
-		var player = Ext.create('Game.sprite.Sprite', {
-			x: 0,
-			y: 0,
-			width: 32,
-			height: 48,
-//			randomize: true
-			src: '/modules/wes/img/sprites/players/mog.png'
-		});
-		player.acceptInput(this.getDeviceInput());
-		player.on('load', function(sprite) {
-			console.log('player loaded ' + sprite.src);
-		}, this);
-		
-		this.addSprite(player);
-		this.getCamera().follow(player);
 //		this.getCamera().follow(this.sprites[0]);
 	},
 	
@@ -87,7 +106,7 @@ Ext.define('Game.game.Game', {
 		// Set any listeners
 		sprite.initGame(this);
 		this.sprites.push(sprite);
-		console.log('Sprite count: ' + this.sprites.length);
+//		console.log('Sprite count: ' + this.sprites.length);
 	},
 	
 	initGameLoop: function() {
@@ -105,7 +124,7 @@ Ext.define('Game.game.Game', {
 		this.getUserInput();
 		this.handleUserInput();
 		this.updatePositions();
-		this.draw();
+//		this.draw();
 		this.camera.restore();
 		this.frameCount++;
 	},
@@ -136,13 +155,7 @@ Ext.define('Game.game.Game', {
 	},
 	
 	draw: function() {
-		// draw random bg boxes
-		for (var i = 0; i < 10; i++) {
-			for (var j = 0; j < 10; j++) {
-				this.context.fillStyle = '#' + i + j + j + i + j + j;
-				this.context.fillRect(100*i, 100*j, 101, 101);
-			}
-		}
+		this.map.draw();
 		
 		var numSprites = this.sprites.length;
 		for (var i = 0; i < numSprites; i++) {
