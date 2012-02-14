@@ -4,16 +4,16 @@ Ext.define('Game.sprite.Character', {
 	config: {
 		name: '',
 		level: 1,
-		life: 0,
-		maxLife: 0,
-		mana: 0,
-		maxMana: 0,
-		strength: 0,
-		vitality: 0,
-		dexterity: 0,
-		intellect: 0,
-		luck: 0,
-		speed: 0,
+		life: 1,
+		maxLife: 1,
+		mana: 1,
+		maxMana: 1,
+		strength: 1,
+		vitality: 1,
+		dexterity: 1,
+		intellect: 1,
+		luck: 1,
+		speed: 1,
 		equipment: null,
 		inventory: null
 	},
@@ -37,16 +37,33 @@ Ext.define('Game.sprite.Character', {
 	attack: function(target) {
 		console.log(this.name + ' attacked ' + target.name);
 		var damage = this.equipment.getWeapon().getDamage();
-		target.defend(damage)
+		damage = target.defend(damage)
+		
+		target.x += 100;
+		target.y += 100;
+		
+		var originalX = this.x;
+		var originalY = this.y;
+		this.animate({
+			duration: 250,
+			to: {
+				x: target.x + this.halfWidth,
+				y: target.y + this.halfHeight
+			}
+		})
 	},
 	
 	defend: function(damage) {
+		console.log('Damage started at ' + damage);
+		damage -= damage * this.strength / 100;
 		console.log(this.name + ' was hit for ' + damage);
+		return damage;
 	},
 	
 	onKeyDownSpace: function() {
-//		this.jump();
-		this.shootPixels();
+		this.jump();
+//		this.shootPixels();
+//		this.attack(this.game.player2);
 	},
 	
 	shootPixels: function() {

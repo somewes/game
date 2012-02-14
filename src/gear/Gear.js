@@ -11,6 +11,10 @@ Ext.define('Game.gear.Gear', {
 		this.initConfig(config);
 		this.callParent(arguments);
 		
+	},
+	
+	generateRandom: function() {
+		
 	}
 	
 });

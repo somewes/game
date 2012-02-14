@@ -14,13 +14,11 @@ Ext.define('Game.game.Game', {
 	},
 	
 	frameCount: 0,
-	sprites: null,
 	ignoreUserInput: false,
 	
 	constructor: function(config) {
 		this.initConfig(config);
 		this.callParent(arguments);
-		this.sprites = [];
 		this.getCanvas().on('afterrender', this.init, this);
 	},
 	
@@ -28,9 +26,9 @@ Ext.define('Game.game.Game', {
 		this.initCanvas();
 		this.initCamera();
 		this.initDeviceInput();
-		this.initPlayer();
 		this.initMap();
-//		this.initSprites();
+		this.initPlayer();
+		this.initSprites();
 		this.initGameLoop();
 	},
 	
@@ -57,10 +55,16 @@ Ext.define('Game.game.Game', {
 	},
 	
 	initMap: function() {
-		this.map = Ext.create('Game.map.Map', {
-			tileSheet: '/modules/wes/img/sprites/maps/jidoor/sheet_new.png',
+//		this.map = Ext.create('Game.map.Tile', {
+//			tileSheet: '/modules/wes/img/sprites/maps/jidoor/sheet_new.png',
+//			game: this
+//		});
+		this.map = Ext.create('Game.map.Debug', {
+			width: 1000,
+			height: 1000,
 			game: this
 		});
+		this.map.checkIfReady();
 	},
 	
 	initPlayer: function() {
@@ -83,30 +87,24 @@ Ext.define('Game.game.Game', {
 		});
 		
 		this.player.acceptInput(this.getDeviceInput());
-		this.addSprite(this.player2);
+		this.map.addSprite(this.player);
+		this.camera.follow(this.player);
+		this.map.addSprite(this.player2);
 		
 		var sword = Ext.create('Game.gear.Sword');
 		this.player.equip(sword, 'rightHand');
-		this.player.attack(this.player2);
-		this.player.attack(this.player2);
-		this.player.attack(this.player2);
+//		this.player.attack(this.player2);
+//		this.player.attack(this.player2);
+//		this.player.attack(this.player2);
 	},
 	
 	initSprites: function() {
 		var num = 9;
 		for (var i = 0; i < num; i++) {
-			this.addSprite(Ext.create('Game.sprite.Base', {
+			this.map.addSprite(Ext.create('Game.sprite.Base', {
 				randomize: true
 			}));
 		}
-//		this.getCamera().follow(this.sprites[0]);
-	},
-	
-	addSprite: function(sprite) {
-		// Set any listeners
-		sprite.initGame(this);
-		this.sprites.push(sprite);
-//		console.log('Sprite count: ' + this.sprites.length);
 	},
 	
 	initGameLoop: function() {
@@ -121,10 +119,10 @@ Ext.define('Game.game.Game', {
 	
 	updateGame: function() {
 		this.camera.clear();
-		this.getUserInput();
-		this.handleUserInput();
+//		this.getUserInput();
+//		this.handleUserInput();
 		this.updatePositions();
-//		this.draw();
+		this.draw();
 		this.camera.restore();
 		this.frameCount++;
 	},
@@ -139,14 +137,7 @@ Ext.define('Game.game.Game', {
 	
 	updatePositions: function() {
 		var currentTime = (new Date()).getTime();
-		var numSprites = this.sprites.length;
-		for (var i = 0; i < numSprites; i++) {
-			this.sprites[i].updatePosition(currentTime);
-		}
-		
-		// sort by width
-		this.sprites.sort(this.sortByY);
-		
+		this.map.updatePositions(currentTime);
 		this.camera.updatePosition(currentTime);
 	},
 	
@@ -156,11 +147,9 @@ Ext.define('Game.game.Game', {
 	
 	draw: function() {
 		this.map.draw();
-		
-		var numSprites = this.sprites.length;
-		for (var i = 0; i < numSprites; i++) {
-			this.sprites[i].draw();
-		}
 	}
 	
-})
+});
+
+// map needs a base class that is empty so we can test configs like mode for sidescrolling or overhead view
+// sprites need to be a mixed collection in the map class so we can loop through an array and also look up the sprites by object to remove them

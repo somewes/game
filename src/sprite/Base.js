@@ -22,11 +22,19 @@ Ext.define('Game.sprite.Base', {
 		animation: null,
 		color: '#FF0000',
 		randomize: false,
-		following: false
+		following: false,
+		id: false
+	},
+	
+	statics: {
+		spriteId: 0
 	},
 	
 	constructor: function(config) {
 		this.initConfig(config);
+		if (!this.id) {
+			this.setId('sprite-' + Game.sprite.Base.spriteId++);
+		}
 		this.callParent(arguments);
 		
 		if (this.randomize) {
