@@ -37,11 +37,6 @@ Ext.define('Game.animation.Animation', {
 			this.setId('animation-' + Game.sprite.Base.spriteId++);
 		}
 		this.callParent(arguments);
-		this.init();
-	},
-	
-	init: function() {
-		
 	},
 	
 	calculateValues: function() {

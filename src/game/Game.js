@@ -98,7 +98,15 @@ Ext.define('Game.game.Game', {
 		this.player.acceptInput(this.getDeviceInput());
 		
 		this.map.addSprite(this.player);
+		
 		this.camera.follow(this.player);
+//		this.player.animate({
+//			duration: 3000,
+//			to: {
+//				x: 400,
+//				y: 400
+//			}
+//		});
 //		this.map.addSprite(this.player2);
 		
 		var sword = Ext.create('Game.gear.Sword');
@@ -109,7 +117,7 @@ Ext.define('Game.game.Game', {
 	},
 	
 	initSprites: function() {
-		var num = 20;
+		var num = 0;
 		for (var i = 0; i < num; i++) {
 			this.map.addSprite(Ext.create('Game.sprite.Base', {
 				randomize: true

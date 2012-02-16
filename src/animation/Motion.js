@@ -2,17 +2,20 @@ Ext.define('Game.animation.Motion', {
 	extend: 'Ext.util.Observable',
 	
 	config: {
+		target: null,
 		isMoving: false,
+		id: false,
+		
 		dx: 0,
 		xVelocity: 0,
 		initialXVelocity: 0,
 		xVelocityMax: null,
-		vxStop: null,
+		xVelocityStop: null,
 		dy: 0,
 		yVelocity: 0,
 		initialYVelocity: 0,
 		yVelocityMax: null,
-		vyStop: null,
+		yVelocityStop: null,
 		yStop: null,
 		xStop: null,
 		xAcceleration: 0,
@@ -23,44 +26,54 @@ Ext.define('Game.animation.Motion', {
 		motionElapsedTime: 0
 	},
 	
+	constructor: function(config) {
+		this.initConfig(config);
+		if (!this.id) {
+			this.setId('motion-' + Game.sprite.Base.spriteId++);
+		}
+		
+		this.callParent(arguments);
+	},
+	
 	startMotion: function(config) {
 		Ext.apply(this, config);
-		this.initialXVelocity = this.vx;
+		this.initialXVelocity = this.xVelocity;
 		this.initialYVelocity = this.yVelocity;
-		this.motionStartX = this.x;
-		this.motionStartY = this.y;
+		this.motionStartX = this.target.x;
+		this.motionStartY = this.target.y;
 		this.motionElapsedTime = 0;
 		this.motionStartTime = (new Date()).getTime();
 		this.isMoving = true;
+		this.fireEvent('start', this);
 	},
 	
 	stopMotion: function() {
-		console.log('stop motion');
-		this.vx = 0;
+		this.xVelocity = 0;
 		this.yVelocity = 0;
-		this.vxStop = null;
+		this.xVelocityStop = null;
 		this.yVelocityStop = null;
 		this.motionElapsedTime = 0;
 		this.isMoving = false;
+		this.fireEvent('stop', this);
 	},
 	
-	updateMotionPosition: function(currentTime) {
+	updatePosition: function(currentTime) {
 		this.motionElapsedTime = currentTime - this.motionStartTime;
 		var t = (this.motionElapsedTime) / 1000;
 		
 		// Update velocity based on time
-		this.vx = this.initialXVelocity + this.xAcceleration * t;
+		this.xVelocity = this.initialXVelocity + this.xAcceleration * t;
 		this.yVelocity = this.initialYVelocity + this.yAcceleration * t;
-		this.dx = this.vx > 0 ? this.vx : -this.vx;
+		this.dx = this.xVelocity > 0 ? this.xVelocity : -this.xVelocity;
 		this.dy = this.yVelocity > 0 ? this.yVelocity : -this.yVelocity;
 		
 		// Restrict velocity and detect when we need to stop in a direction
-		if (this.xVelocityelocityMax !== null && this.dx > this.xVelocityelocityMax) {
-			this.dx = this.xVelocityelocityMax;
-			this.vx = this.vx > 0 ? this.xVelocityelocityMax : -this.xVelocityelocityMax;
+		if (this.xVelocityMax !== null && this.dx > this.xVelocityMax) {
+			this.dx = this.xVelocityMax;
+			this.xVelocity = this.xVelocity > 0 ? this.xVelocityMax : -this.xVelocityMax;
 		}
-		else if (this.vxStop !== null && ((this.xAcceleration < 0 && this.vx <= this.vxStop) || (this.xAcceleration > 0 && this.vx >= this.vxStop))) {
-			this.vx = this.vxStop;
+		else if (this.xVelocityStop !== null && ((this.xAcceleration < 0 && this.xVelocity <= this.xVelocityStop) || (this.xAcceleration > 0 && this.xVelocity >= this.xVelocityStop))) {
+			this.xVelocity = this.xVelocityStop;
 			this.xAcceleration = 0;
 			this.initialXVelocity = 0;
 		}
@@ -75,13 +88,13 @@ Ext.define('Game.animation.Motion', {
 			this.initialYVelocity = 0;
 		}
 		
-		if ((this.vx === this.vxStop || this.vx === 0) && (this.yVelocity === this.yVelocityStop || this.yVelocity === 0)) {
+		if ((this.xVelocity === this.xVelocityStop || this.xVelocity === 0) && (this.yVelocity === this.yVelocityStop || this.yVelocity === 0)) {
 			this.stopMotion();
 		}
 		
 		// Update position
-		this.x += this.vx;
-		this.y += this.yVelocity;
+		this.target.x += this.xVelocity;
+		this.target.y += this.yVelocity;
 		
 		if (this.yStop !== null && this.y >= this.yStop) {
 			this.yVelocity = 0;

@@ -61,8 +61,8 @@ Ext.define('Game.sprite.Character', {
 	},
 	
 	onKeyDownSpace: function() {
-		this.jump();
-//		this.shootPixels();
+//		this.jump();
+		this.shootPixels();
 //		this.attack(this.game.player2);
 	},
 	
@@ -70,8 +70,8 @@ Ext.define('Game.sprite.Character', {
 		var numPixels = 50;
 		for (var i = 0; i < numPixels; i++) {
 			var hex = this.getRandomHex();
-			var vx = this.randy(-5, 5);
-			var vy = this.randy(-5, 5);
+			var xVelocity = this.randy(-5, 5);
+			var yVelocity = this.randy(-5, 5);
 			var one = Ext.create('Game.sprite.Base', {
 				width: 5,
 				height: 5,
@@ -96,20 +96,20 @@ Ext.define('Game.sprite.Character', {
 				y: one.y,
 			});
 			
-			this.game.addSprite(one);
-			this.game.addSprite(two);
-			this.game.addSprite(three);
+			this.game.map.addSprite(one);
+			this.game.map.addSprite(two);
+			this.game.map.addSprite(three);
 			one.startMotion({
-				vx: vx,
-				vy: vy
+				xVelocity: xVelocity,
+				yVelocity: yVelocity
 			});
 			two.startMotion({
-				vx: vx*.9,
-				vy: vy*.9
+				xVelocity: xVelocity*.9,
+				yVelocity: yVelocity*.9
 			});
 			three.startMotion({
-				vx: vx*.8,
-				vy: vy*.8
+				xVelocity: xVelocity*.8,
+				yVelocity: yVelocity*.8
 			});
 			
 			
@@ -119,30 +119,30 @@ Ext.define('Game.sprite.Character', {
 	jump: function() {
 		this.isMoving = false;
 		var animationData = {
-			ay: 20,
-			vy: -10,
-			vxMax: null,
-			vyMax: null,
-			vxStop: 0,
-			vyStop: null,
+			yAcceleration: 20,
+			yVelocity: -10,
+			xVelocityMax: null,
+			yVelocityMax: null,
+			xVelocityStop: 0,
+			yVelocityStop: null,
 			yStop: this.y
 		};
-		if (this.vx > 0) {
-			animationData.vx = this.vx + 5;
-			animationData.ax = -2;
+		if (this.xVelocity > 0) {
+			animationData.xVelocity = this.xVelocity + 5;
+			animationData.xAcceleration = -2;
 		}
-		else if (this.vx < 0) {
-			animationData.vx = this.vx - 5;
-			animationData.ax = 2;
+		else if (this.xVelocity < 0) {
+			animationData.xVelocity = this.xVelocity - 5;
+			animationData.xAcceleration = 2;
 		}
 		this.startMotion(animationData);
 	},
 	
 	onKeyDownRight: function() {
 		this.startMotion({
-			ax: 5,
-			vxMax: 3,
-			vxStop: null
+			xAcceleration: 5,
+			xVelocityMax: 3,
+			xVelocityStop: null
 		});
 		this.playSequence(Ext.create('Game.sprite.Sequence', {
 			sequence: [18,3,33,3]
@@ -155,17 +155,17 @@ Ext.define('Game.sprite.Character', {
 		}
 		else {
 			this.startMotion({
-				ax: -3,
-				vxStop: 0
+				xAcceleration: -3,
+				xVelocityStop: 0
 			});
 		}
 	},
 	
 	onKeyDownLeft: function() {
 		this.startMotion({
-			ax: -5,
-			vxMax: 3,
-			vxStop: null
+			xAcceleration: -5,
+			xVelocityMax: 3,
+			xVelocityStop: null
 		});
 		this.playSequence(Ext.create('Game.sprite.Sequence', {
 			sequence: [17,2,32,2]
@@ -178,17 +178,17 @@ Ext.define('Game.sprite.Character', {
 		}
 		else {
 			this.startMotion({
-				ax: 3,
-				vxStop: 0
+				xAcceleration: 3,
+				xVelocityStop: 0
 			});
 		}
 	},
 	
 	onKeyDownUp: function() {
 		this.startMotion({
-			ay: -5,
-			vyMax: 3,
-			vyStop: null
+			yAcceleration: -5,
+			yVelocityMax: 3,
+			yVelocityStop: null
 		});
 		this.playSequence(Ext.create('Game.sprite.Sequence', {
 			sequence: [16,1,31,1]
@@ -201,17 +201,17 @@ Ext.define('Game.sprite.Character', {
 		}
 		else {
 			this.startMotion({
-				ay: 3,
-				vyStop: 0
+				yAcceleration: 3,
+				yVelocityStop: 0
 			});
 		}
 	},
 	
 	onKeyDownDown: function() {
 		this.startMotion({
-			ay: 5,
-			vyMax: 3,
-			vyStop: null
+			yAcceleration: 5,
+			yVelocityMax: 3,
+			yVelocityStop: null
 		});
 		this.playSequence(Ext.create('Game.sprite.Sequence', {
 			sequence: [15,0,30,0]
@@ -224,8 +224,8 @@ Ext.define('Game.sprite.Character', {
 		}
 		else {
 			this.startMotion({
-				ay: -3,
-				vyStop: 0
+				yAcceleration: -3,
+				yVelocityStop: 0
 			});
 		}
 	}

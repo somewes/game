@@ -3,7 +3,8 @@ Ext.define('Game.animation.Animate', {
 	
 	config: {
 		animation: null,
-		animations: null
+		animations: null,
+		motion: null
 	},
 	
 	animate: function(config) {
@@ -54,6 +55,38 @@ Ext.define('Game.animation.Animate', {
 			this.animation = this.animations.items[0];
 			this.animation.start();
 		}
+	},
+	
+	clearAnimations: function() {
+		if (this.animations) {
+			this.animations.clear();
+			this.onAnimationStop(this.animation);
+		}
+	},
+	
+	startMotion: function(config) {
+		if (!this.animations) {
+			this.animations = new Ext.util.MixedCollection();
+		}
+		config.target = this;
+		if (!this.motion) {
+			this.motion = Ext.create('Game.animation.Motion', config);
+			this.motion.on({
+				scope: this,
+				start: this.onMotionStart,
+				stop: this.onMotionStop
+			});
+		}
+		
+		this.motion.startMotion(config);
+	},
+	
+	onMotionStart: function(motion) {
+		this.game.animationManager.add(motion);
+	},
+	
+	onMotionStop: function(motion) {
+		this.game.animationManager.remove(motion);
 	}
 	
 });
