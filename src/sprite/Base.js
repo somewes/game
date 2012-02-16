@@ -106,16 +106,12 @@ Ext.define('Game.sprite.Base', {
 	},
 	
 	updatePosition: function(currentTime) {
-		if (this.isMoving) {
-			this.updateMotionPosition(currentTime);
-		}
-		else if (this.following) {
+//		if (this.isMoving) {
+//			this.updateMotionPosition(currentTime);
+//		}
+		if (this.following) {
 			this.x = this.following.x + this.following.halfWidth - this.halfWidth;
 			this.y = this.following.y + this.following.halfHeight - this.halfHeight;
-		}
-		else if (this.animation) {
-			this.currentTime = currentTime;
-			this.animation.updatePosition(currentTime);
 		}
 	},
 	

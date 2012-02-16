@@ -99,23 +99,7 @@ Ext.define('Game.game.Game', {
 		
 		this.map.addSprite(this.player);
 		this.camera.follow(this.player);
-		this.map.addSprite(this.player2);
-		
-		this.player.animate({
-			duration: 1000,
-			to: {
-				x: 100,
-				y: 100
-			}
-		});
-		
-		this.player.animate({
-			duration: 1000,
-			to: {
-				x: 150,
-				y: 150
-			}
-		});
+//		this.map.addSprite(this.player2);
 		
 		var sword = Ext.create('Game.gear.Sword');
 		this.player.equip(sword, 'rightHand');
@@ -125,7 +109,7 @@ Ext.define('Game.game.Game', {
 	},
 	
 	initSprites: function() {
-		var num = 9;
+		var num = 20;
 		for (var i = 0; i < num; i++) {
 			this.map.addSprite(Ext.create('Game.sprite.Base', {
 				randomize: true
@@ -165,10 +149,6 @@ Ext.define('Game.game.Game', {
 		var currentTime = (new Date()).getTime();
 		this.animationManager.updatePositions(currentTime);
 		this.camera.updatePosition(currentTime);
-	},
-	
-	sortByY: function(a, b) {
-		return a.y - b.y;
 	},
 	
 	draw: function() {

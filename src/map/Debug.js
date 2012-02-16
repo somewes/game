@@ -20,6 +20,7 @@ Ext.define('Game.map.Debug', {
 		}
 		
 		var items = this.sprites.items;
+		items.sort(this.sortByY);
 		var numSprites = items.length;
 		for (var i = 0; i < numSprites; i++) {
 			items[i].draw();

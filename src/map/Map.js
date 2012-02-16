@@ -42,10 +42,15 @@ Ext.define('Game.map.Map', {
 		}
 		
 		var items = this.sprites.items;
+		items.sort(this.sortByY);
 		var numSprites = items.length;
 		for (var i = 0; i < numSprites; i++) {
 			items[i].draw();
 		}
+	},
+	
+	sortByY: function(a, b) {
+		return a.y - b.y;
 	},
 	
 	setGameDetails: function() {

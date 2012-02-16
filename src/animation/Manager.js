@@ -27,9 +27,6 @@ Ext.define('Game.animation.Manager', {
 		for (var i = 0; i < this.numItems; i++) {
 			items[i].updatePosition(currentTime);
 		}
-		
-		// sort by width
-//		this.sprites.sort(this.sortByY);
 	}
 	
 });

@@ -4,56 +4,29 @@ Ext.define('Game.animation.Motion', {
 	config: {
 		isMoving: false,
 		dx: 0,
-		vx: 0,
-		v0x: 0,
-		vxMax: null,
+		xVelocity: 0,
+		initialXVelocity: 0,
+		xVelocityMax: null,
 		vxStop: null,
 		dy: 0,
-		vy: 0,
-		v0y: 0,
-		vyMax: null,
+		yVelocity: 0,
+		initialYVelocity: 0,
+		yVelocityMax: null,
 		vyStop: null,
 		yStop: null,
 		xStop: null,
-		ax: 0,
-		ay: 0,
+		xAcceleration: 0,
+		yAcceleration: 0,
 		motionStartTime: null,
 		motionStartX: 0,
 		motionStartY: 0,
 		motionElapsedTime: 0
 	},
 	
-//	accelerateX: function(acceleration, max) {
-//		this.ax = acceleration;
-//		this.vxStop = null;
-//		this.vxMax = max;
-//		this.startMotion();
-//	},
-//	
-//	decelerateX: function(acceleration, vxStop) {
-//		this.ax = acceleration;
-//		this.vxStop = vxStop;
-//		this.startMotion();
-//	},
-//	
-//	accelerateY: function(acceleration, max) {
-//		this.ay = acceleration;
-//		this.vyStop = null;
-//		this.vyMax = max;
-//		this.startMotion();
-//	},
-//	
-//	decelerateY: function(acceleration, vyStop) {
-//		this.ay = acceleration;
-//		this.vyStop = vyStop;
-//		this.startMotion();
-//	},
-	
-	
 	startMotion: function(config) {
 		Ext.apply(this, config);
-		this.v0x = this.vx;
-		this.v0y = this.vy;
+		this.initialXVelocity = this.vx;
+		this.initialYVelocity = this.yVelocity;
 		this.motionStartX = this.x;
 		this.motionStartY = this.y;
 		this.motionElapsedTime = 0;
@@ -64,9 +37,9 @@ Ext.define('Game.animation.Motion', {
 	stopMotion: function() {
 		console.log('stop motion');
 		this.vx = 0;
-		this.vy = 0;
+		this.yVelocity = 0;
 		this.vxStop = null;
-		this.vyStop = null;
+		this.yVelocityStop = null;
 		this.motionElapsedTime = 0;
 		this.isMoving = false;
 	},
@@ -76,44 +49,44 @@ Ext.define('Game.animation.Motion', {
 		var t = (this.motionElapsedTime) / 1000;
 		
 		// Update velocity based on time
-		this.vx = this.v0x + this.ax * t;
-		this.vy = this.v0y + this.ay * t;
+		this.vx = this.initialXVelocity + this.xAcceleration * t;
+		this.yVelocity = this.initialYVelocity + this.yAcceleration * t;
 		this.dx = this.vx > 0 ? this.vx : -this.vx;
-		this.dy = this.vy > 0 ? this.vy : -this.vy;
+		this.dy = this.yVelocity > 0 ? this.yVelocity : -this.yVelocity;
 		
 		// Restrict velocity and detect when we need to stop in a direction
-		if (this.vxMax !== null && this.dx > this.vxMax) {
-			this.dx = this.vxMax;
-			this.vx = this.vx > 0 ? this.vxMax : -this.vxMax;
+		if (this.xVelocityelocityMax !== null && this.dx > this.xVelocityelocityMax) {
+			this.dx = this.xVelocityelocityMax;
+			this.vx = this.vx > 0 ? this.xVelocityelocityMax : -this.xVelocityelocityMax;
 		}
-		else if (this.vxStop !== null && ((this.ax < 0 && this.vx <= this.vxStop) || (this.ax > 0 && this.vx >= this.vxStop))) {
+		else if (this.vxStop !== null && ((this.xAcceleration < 0 && this.vx <= this.vxStop) || (this.xAcceleration > 0 && this.vx >= this.vxStop))) {
 			this.vx = this.vxStop;
-			this.ax = 0;
-			this.v0x = 0;
+			this.xAcceleration = 0;
+			this.initialXVelocity = 0;
 		}
 		
-		if (this.vyMax !== null && this.dy > this.vyMax) {
-			this.dy = this.vyMax;
-			this.vy = this.vy > 0 ? this.vyMax : -this.vyMax;
+		if (this.yVelocityMax !== null && this.dy > this.yVelocityMax) {
+			this.dy = this.yVelocityMax;
+			this.yVelocity = this.yVelocity > 0 ? this.yVelocityMax : -this.yVelocityMax;
 		}
-		else if (this.vyStop !== null && ((this.ay < 0 && this.vy <= this.vyStop) || (this.ay > 0 && this.vy >= this.vyStop))) {
-			this.vy = this.vyStop;
-			this.ay = 0;
-			this.v0y = 0;
+		else if (this.yVelocityStop !== null && ((this.yAcceleration < 0 && this.yVelocity <= this.yVelocityStop) || (this.yAcceleration > 0 && this.yVelocity >= this.yVelocityStop))) {
+			this.yVelocity = this.yVelocityStop;
+			this.yAcceleration = 0;
+			this.initialYVelocity = 0;
 		}
 		
-		if ((this.vx === this.vxStop || this.vx === 0) && (this.vy === this.vyStop || this.vy === 0)) {
+		if ((this.vx === this.vxStop || this.vx === 0) && (this.yVelocity === this.yVelocityStop || this.yVelocity === 0)) {
 			this.stopMotion();
 		}
 		
 		// Update position
 		this.x += this.vx;
-		this.y += this.vy;
+		this.y += this.yVelocity;
 		
 		if (this.yStop !== null && this.y >= this.yStop) {
-			this.vy = 0;
-			this.ay = 0;
-			this.v0y = 0;
+			this.yVelocity = 0;
+			this.yAcceleration = 0;
+			this.initialYVelocity = 0;
 			this.yStop = null;
 		}
 	}
