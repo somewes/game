@@ -25,7 +25,6 @@ Ext.define('Game.Camera', {
 		if (this.boundY2 !== null) {
 			this.setBoundY2(this.boundY2 - this.height);
 		}
-		console.log(this);
 	},
 	
 	clear: function() {

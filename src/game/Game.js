@@ -1,5 +1,8 @@
 Ext.define('Game.game.Game', {
 	extend: 'Ext.util.Observable',
+	requires: [
+		'Game.animation.Manager'
+	],
 	
 	config: {
 		canvas: null,
@@ -10,7 +13,8 @@ Ext.define('Game.game.Game', {
 		height: 480,
 		deviceInput: null,
 		camera: null,
-		player: null
+		player: null,
+		animationManager: null
 	},
 	
 	frameCount: 0,
@@ -26,6 +30,7 @@ Ext.define('Game.game.Game', {
 		this.initCanvas();
 		this.initCamera();
 		this.initDeviceInput();
+		this.initAnimationManager();
 		this.initMap();
 		this.initPlayer();
 		this.initSprites();
@@ -52,6 +57,10 @@ Ext.define('Game.game.Game', {
 		this.setDeviceInput(Ext.create('Game.input.Keyboard', {
 			game: this
 		}));
+	},
+	
+	initAnimationManager: function() {
+		this.animationManager = new Game.animation.Manager();
 	},
 	
 	initMap: function() {
@@ -87,9 +96,26 @@ Ext.define('Game.game.Game', {
 		});
 		
 		this.player.acceptInput(this.getDeviceInput());
+		
 		this.map.addSprite(this.player);
 		this.camera.follow(this.player);
 		this.map.addSprite(this.player2);
+		
+		this.player.animate({
+			duration: 1000,
+			to: {
+				x: 100,
+				y: 100
+			}
+		});
+		
+		this.player.animate({
+			duration: 1000,
+			to: {
+				x: 150,
+				y: 150
+			}
+		});
 		
 		var sword = Ext.create('Game.gear.Sword');
 		this.player.equip(sword, 'rightHand');
@@ -137,7 +163,7 @@ Ext.define('Game.game.Game', {
 	
 	updatePositions: function() {
 		var currentTime = (new Date()).getTime();
-		this.map.updatePositions(currentTime);
+		this.animationManager.updatePositions(currentTime);
 		this.camera.updatePosition(currentTime);
 	},
 	

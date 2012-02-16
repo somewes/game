@@ -1,10 +1,12 @@
 Ext.define('Game.sprite.Base', {
 	extend: 'Ext.util.Observable',
 	mixins: {
+		animate: 'Game.animation.Animate',
 		motion: 'Game.animation.Motion',
 		input: 'Game.input.Listener'
 	},
 	requires: [
+		'Game.animation.Animate',
 		'Game.animation.Motion',
 		'Game.input.Listener'
 	],
@@ -36,7 +38,6 @@ Ext.define('Game.sprite.Base', {
 			this.setId('sprite-' + Game.sprite.Base.spriteId++);
 		}
 		this.callParent(arguments);
-		
 		if (this.randomize) {
 			this.randomizeProperties();
 		}
@@ -94,17 +95,6 @@ Ext.define('Game.sprite.Base', {
 		if (this.randomize) {
 			this.doRandomAnimation();
 		}
-	},
-	
-	animate: function(config) {
-		config.target = this;
-		config.scope = this;
-		if (this.animation && this.animation.isRunning) {
-			console.log('cancel it');
-			this.animation.cancel();
-			delete this.animation;
-		}
-		this.animation = Ext.create('Game.Animation', config);
 	},
 	
 	hide: function() {

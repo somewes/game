@@ -23,10 +23,10 @@ Ext.define('Game.Equipment', {
 	},
 	
 	equip: function(item, slot) {
-		console.log('equip ' + item.name + ' in ' + slot);
+//		console.log('equip ' + item.name + ' in ' + slot);
 		this.unequip(this[slot]);
 		this[slot] = item;
-		console.log(this);
+//		console.log(this);
 	},
 	
 	unequip: function(item) {

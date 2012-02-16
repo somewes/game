@@ -31,11 +31,11 @@ Ext.define('Game.sprite.Character', {
 	
 	equip: function(item, slot) {
 		this.equipment.equip(item, slot);
-		console.log(this);
+//		console.log(this);
 	},
 	
 	attack: function(target) {
-		console.log(this.name + ' attacked ' + target.name);
+//		console.log(this.name + ' attacked ' + target.name);
 		var damage = this.equipment.getWeapon().getDamage();
 		damage = target.defend(damage)
 		
@@ -54,9 +54,9 @@ Ext.define('Game.sprite.Character', {
 	},
 	
 	defend: function(damage) {
-		console.log('Damage started at ' + damage);
+//		console.log('Damage started at ' + damage);
 		damage -= damage * this.strength / 100;
-		console.log(this.name + ' was hit for ' + damage);
+//		console.log(this.name + ' was hit for ' + damage);
 		return damage;
 	},
 	

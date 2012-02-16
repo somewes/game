@@ -36,17 +36,6 @@ Ext.define('Game.map.Map', {
 		this.sprites.add(sprite.getId(), sprite);
 	},
 	
-	updatePositions: function(currentTime) {
-		var items = this.sprites.items;
-		var numSprites = items.length;
-		for (var i = 0; i < numSprites; i++) {
-			items[i].updatePosition(currentTime);
-		}
-		
-		// sort by width
-//		this.sprites.sort(this.sortByY);
-	},
-	
 	draw: function() {
 		if (!this.isReady) {
 			return;
