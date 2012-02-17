@@ -79,6 +79,7 @@ Ext.define('Game.animation.Animate', {
 		}
 		
 		this.motion.startMotion(config);
+		return this;
 	},
 	
 	onMotionStart: function(motion) {
