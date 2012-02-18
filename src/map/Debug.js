@@ -2,7 +2,7 @@ Ext.define('Game.map.Debug', {
 	extend: 'Game.map.Map',
 	
 	config: {
-		
+		gravity: 10
 	},
 	
 	draw: function() {

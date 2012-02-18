@@ -13,6 +13,7 @@ Ext.define('Game.sprite.Sprite', {
 		this.playSequence(Ext.create('Game.sprite.Sequence', {
 			sequence: [0]
 		}));
+		
 		this.img = Ext.get(new Image());
 		this.img.dom.width = this.width;
 		this.img.dom.height = this.height;
@@ -34,14 +35,8 @@ Ext.define('Game.sprite.Sprite', {
 		this.fireEvent('load', this);
 	},
 	
-	updatePosition: function(currentTime) {
-		this.callParent(arguments);
-		
-		// Update the current frame
-		this.currentFrame = this.sequence.getFrame(this.motionElapsedTime, this.getSequenceDurationFactor());
-	},
-	
 	getSequenceDurationFactor: function() {
+		return 1;
 		if (this.dx > this.dy) {
 			return Math.round(this.dx/2, 2);
 		}
@@ -54,6 +49,11 @@ Ext.define('Game.sprite.Sprite', {
 		if (!this.hidden) {
 			var context = this.getContext();
 //			this.context.drawImage(this.img.dom, 32, 0, this.width, this.height, this.x, this.y, this.width, this.height);
+			
+			// Update the current frame
+			if (this.motion) {
+				this.currentFrame = this.sequence.getFrame(this.motion.motionElapsedTime, this.getSequenceDurationFactor());
+			}
 			this.context.drawImage(this.img.dom, this.currentFrame * this.width, 0, this.width, this.height, this.x, this.y, this.width, this.height);
 		}
 	},

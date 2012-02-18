@@ -53,7 +53,6 @@ Ext.define('Game.animation.Motion', {
 	},
 	
 	stopMotion: function() {
-		console.log('stop motion');
 		this.xVelocity = 0;
 		this.yVelocity = 0;
 		this.xVelocityStop = null;

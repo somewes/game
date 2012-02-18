@@ -35,35 +35,70 @@ Ext.define('Game.sprite.Character', {
 	},
 	
 	attack: function(target) {
-//		console.log(this.name + ' attacked ' + target.name);
+		console.log(this.name + ' attacked ' + target.name);
 		var damage = this.equipment.getWeapon().getDamage();
 		damage = target.defend(damage)
 		
-		target.x += 100;
-		target.y += 100;
-		
 		var originalX = this.x;
 		var originalY = this.y;
+		
 		this.animate({
-			duration: 250,
+			duration: 200,
 			to: {
-				x: target.x + this.halfWidth,
-				y: target.y + this.halfHeight
+				x: target.x,
+				y: target.y
 			}
-		})
+		}).on('stop', function() {
+			this.showDamageText(damage, target);
+			this.showDamageText(damage, target);
+			this.showDamageText(damage, target);
+		}, this);
+		
+		this.animate({
+			duration: 200,
+			to: {
+				x: originalX,
+				y: originalY
+			}
+		});
+	},
+	
+	showDamageText: function(damage, target) {
+		var damageText = Ext.create('Game.sprite.DamageText', {
+			damage: damage,
+			following: target,
+			x: target.x,
+			y: target.y
+		});
+		this.game.map.addSprite(damageText);
+
+		var xVelocity = this.randy(-5, 5);
+		var yVelocity = -damage;
+		damageText.startMotion({
+			xVelocity: xVelocity,
+			xAcceleration: -xVelocity*3,
+			xVelocityStop: 0,
+			yVelocity: yVelocity,
+			yAcceleration: -yVelocity*3,
+			yStop: target.y
+//				xStop: target.x + xVelocity*5
+		}).on('stop', function(motion) {
+			motion.target.remove();
+		}, this);
 	},
 	
 	defend: function(damage) {
 //		console.log('Damage started at ' + damage);
 		damage -= damage * this.strength / 100;
-//		console.log(this.name + ' was hit for ' + damage);
+		damage = Math.round(damage);
+		console.log(this.name + ' was hit for ' + damage);
 		return damage;
 	},
 	
 	onKeyDownSpace: function() {
-		this.jump();
+//		this.jump();
 //		this.shootPixels();
-//		this.attack(this.game.player2);
+		this.attack(this.game.player2);
 	},
 	
 	shootPixels: function() {
@@ -117,8 +152,8 @@ Ext.define('Game.sprite.Character', {
 	},
 	
 	jump: function() {
-		var gravity = 30;
-		var yVelocity = -25;
+		var gravity = this.game.map.gravity;
+		var yVelocity = -5;
 		if (gravity < 0) {
 			yVelocity = -yVelocity;
 		}

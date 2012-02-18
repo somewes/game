@@ -33,6 +33,12 @@ Ext.define('Game.map.Map', {
 	
 	addSprite: function(sprite) {
 		sprite.initGame(this.game);
+		sprite.on('remove', function(sprite) {
+			console.log('remove');
+			console.log(this.sprites.items.length);
+			this.sprites.remove(sprite);
+			console.log(this.sprites.items.length);
+		}, this);
 		this.sprites.add(sprite.getId(), sprite);
 	},
 	
@@ -60,6 +66,14 @@ Ext.define('Game.map.Map', {
 			boundX2: this.width,
 			boundY2: this.height
 		});
+	},
+	
+	handleCollisions: function() {
+//		var items = this.sprites.items;
+//		var numSprites = items.length;
+//		for (var i = 0; i < numSprites; i++) {
+//			
+//		}
 	}
 	
 });

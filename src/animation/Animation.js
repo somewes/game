@@ -45,8 +45,8 @@ Ext.define('Game.animation.Animation', {
 		this.startWidth = this.target.getWidth();
 		this.startHeight = this.target.getHeight();
 		
-		this.stopX = this.to.x || this.startX;
-		this.stopY = this.to.y || this.startY;
+		this.stopX = this.to.x != null ? this.to.x : this.startX;
+		this.stopY = this.to.y != null ? this.to.y : this.startY;
 		this.stopWidth = this.to.width || this.startWidth;
 		this.stopHeight = this.to.height || this.startHeight;
 		

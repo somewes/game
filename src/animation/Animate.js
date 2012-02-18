@@ -11,6 +11,9 @@ Ext.define('Game.animation.Animate', {
 		if (!this.animations) {
 			this.animations = new Ext.util.MixedCollection();
 		}
+		else if (this.motion) {
+			this.motion.stopMotion();
+		}
 		
 		config.target = this;
 		
@@ -27,7 +30,7 @@ Ext.define('Game.animation.Animate', {
 		
 		this.startNextAnimation();
 		
-		return this;
+		return animation;
 	},
 	
 	addAnimation: function(animation) {
@@ -68,6 +71,10 @@ Ext.define('Game.animation.Animate', {
 		if (!this.animations) {
 			this.animations = new Ext.util.MixedCollection();
 		}
+		if (this.animation) {
+			this.clearAnimations();
+		}
+		
 		config.target = this;
 		if (!this.motion) {
 			this.motion = Ext.create('Game.animation.Motion', config);
@@ -79,7 +86,7 @@ Ext.define('Game.animation.Animate', {
 		}
 		
 		this.motion.startMotion(config);
-		return this;
+		return this.motion;
 	},
 	
 	onMotionStart: function(motion) {
@@ -88,6 +95,7 @@ Ext.define('Game.animation.Animate', {
 	
 	onMotionStop: function(motion) {
 		this.game.animationManager.remove(motion);
+		delete this.motion;
 	}
 	
 });

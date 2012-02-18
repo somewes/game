@@ -125,6 +125,10 @@ Ext.define('Game.sprite.Base', {
 				context.fillText(this.animation.remainingTime, this.x, this.y);
 			}
 		}
+	},
+	
+	remove: function() {
+		this.fireEvent('remove', this);
 	}
 	
 	

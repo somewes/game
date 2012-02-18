@@ -83,7 +83,6 @@ Ext.define('Game.game.Game', {
 			y: 0,
 			width: 32,
 			height: 48,
-//			randomize: true,
 			src: '/modules/wes/img/sprites/players/mog.png'
 		});
 		this.player2 = Ext.create('Game.sprite.Character', {
@@ -96,18 +95,16 @@ Ext.define('Game.game.Game', {
 		});
 		
 		this.player.acceptInput(this.getDeviceInput());
-		
 		this.map.addSprite(this.player);
-		
 		this.camera.follow(this.player);
-//		this.player.animate({
-//			duration: 3000,
-//			to: {
-//				x: 400,
-//				y: 400
-//			}
-//		});
-//		this.map.addSprite(this.player2);
+		this.map.addSprite(this.player2);
+		this.player2.animate({
+			duration: 2000,
+			to: {
+				x: 100,
+				y: 100
+			}
+		});
 		
 		var sword = Ext.create('Game.gear.Sword');
 		this.player.equip(sword, 'rightHand');
@@ -156,6 +153,7 @@ Ext.define('Game.game.Game', {
 	updatePositions: function() {
 		var currentTime = (new Date()).getTime();
 		this.animationManager.updatePositions(currentTime);
+		this.map.handleCollisions();
 		this.camera.updatePosition(currentTime);
 	},
 	
