@@ -23,12 +23,12 @@ else {
 
 Ext.onReady(function() {
 	Ext.require([
-		'Lapidos.os.OS',
+		'Lapidos.os.Os',
 		'Lapidos.shell.dom.Dom',
 		'Lapidos.shell.navigation.Dom',
 		'Game.module.Game'
 	], function() {
-		window.os = new Lapidos.os.OS();
+		window.os = new Lapidos.os.Os();
 		
 		var shell = new Lapidos.shell.dom.Dom(os, {
 			
