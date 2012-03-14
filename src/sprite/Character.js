@@ -34,6 +34,16 @@ Ext.define('Game.sprite.Character', {
 //		console.log(this);
 	},
 	
+	getDistance: function(point1, point2) {
+		var xs = 0;
+		var ys = 0;
+		xs = point2.x - point1.x;
+		xs = xs * xs;
+		ys = point2.y - point1.y;
+		ys = ys * ys;
+		return Math.sqrt( xs + ys );
+	},
+	
 	attack: function(target) {
 		console.log(this.name + ' attacked ' + target.name);
 		var damage = this.equipment.getWeapon().getDamage();
@@ -42,20 +52,26 @@ Ext.define('Game.sprite.Character', {
 		var originalX = this.x;
 		var originalY = this.y;
 		
+		var distance = this.getDistance({x: this.x, y: this.y}, {x: target.x, y: target.y});
+		console.log(distance);
+		var duration = Math.log(distance) * 100;
+		console.log(duration);
 		this.animate({
-			duration: 200,
+			duration: duration,
 			to: {
 				x: target.x,
 				y: target.y
+			},
+			bezier: {
+				x: this.x + (target.x - this.x) * .9,
+				y: target.y - 150
 			}
 		}).on('stop', function() {
-			this.showDamageText(damage, target);
-			this.showDamageText(damage, target);
 			this.showDamageText(damage, target);
 		}, this);
 		
 		this.animate({
-			duration: 200,
+			duration: duration/1.5,
 			to: {
 				x: originalX,
 				y: originalY
@@ -98,17 +114,17 @@ Ext.define('Game.sprite.Character', {
 	onKeyDownSpace: function() {
 //		this.jump();
 //		this.shootPixels();
-		var sharedData = {
-			name: this.name,
-			src: this.src,
-			width: this.width,
-			height: this.height,
-			x: this.x,
-			y: this.y
-		};
-		this.createShared(this.game.client, sharedData);
+//		var sharedData = {
+//			name: this.name,
+//			src: this.src,
+//			width: this.width,
+//			height: this.height,
+//			x: this.x,
+//			y: this.y
+//		};
+//		this.createShared(this.game.client, sharedData);
 		
-//		this.callSharedMethod('attack', [this.game.player2]);
+		this.callSharedMethod('attack', [this.game.player2]);
 	},
 	
 	shootPixels: function() {

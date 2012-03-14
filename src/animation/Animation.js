@@ -16,6 +16,8 @@ Ext.define('Game.animation.Animation', {
 		totalX: 0,
 		totalY: 0,
 		
+		bezier: false,
+		
 		startWidth: 0,
 		startHeight: 0,
 		stopWidth: 0,
@@ -100,10 +102,31 @@ Ext.define('Game.animation.Animation', {
 		}
 		
 		var easeValue = this.easing(percentage);
-		this.target.x = this.startX + this.totalX * easeValue;
-		this.target.y = this.startY + this.totalY * easeValue;
+		
+		// Check if path is a line or bezier
+		if (this.bezier) {
+			this.target.x = this.startX * this.b0(easeValue) + this.bezier.x * this.b1(easeValue) + this.stopX * this.b2(easeValue);
+			this.target.y = this.startY * this.b0(easeValue) + this.bezier.y * this.b1(easeValue) + this.stopY * this.b2(easeValue);
+		}
+		else {
+			this.target.x = this.startX + this.totalX * easeValue;
+			this.target.y = this.startY + this.totalY * easeValue;
+		}
+		
 		this.target.width = this.startWidth + this.totalWidth * easeValue;
 		this.target.height = this.startHeight + this.totalHeight * easeValue;
+	},
+	
+	b0: function(percent) {
+		return Math.pow(1 - percent, 2);
+	},
+	
+	b1: function(percent) {
+		return 2 * percent * (1 - percent);
+	},
+	
+	b2: function(percent) {
+		return percent * percent;
 	}
 	
 });
