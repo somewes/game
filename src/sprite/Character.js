@@ -53,9 +53,7 @@ Ext.define('Game.sprite.Character', {
 		var originalY = this.y;
 		
 		var distance = this.getDistance({x: this.x, y: this.y}, {x: target.x, y: target.y});
-		console.log(distance);
 		var duration = Math.log(distance) * 100;
-		console.log(duration);
 		this.animate({
 			duration: duration,
 			to: {
