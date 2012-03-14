@@ -10,9 +10,7 @@ Ext.define('Game.sprite.Sprite', {
 	
 	constructor: function() {
 		this.callParent(arguments);
-		this.playSequence(Ext.create('Game.sprite.Sequence', {
-			sequence: [0]
-		}));
+		this.createAndPlaySequence([0]);
 		
 		this.img = Ext.get(new Image());
 		this.img.dom.width = this.width;
@@ -56,6 +54,12 @@ Ext.define('Game.sprite.Sprite', {
 			}
 			this.context.drawImage(this.img.dom, this.currentFrame * this.width, 0, this.width, this.height, this.x, this.y, this.width, this.height);
 		}
+	},
+	
+	createAndPlaySequence: function(frameArray) {
+		this.playSequence(Ext.create('Game.sprite.Sequence', {
+			sequence: frameArray
+		}));
 	},
 	
 	playSequence: function(sequence) {

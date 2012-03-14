@@ -14,7 +14,8 @@ Ext.define('Game.game.Game', {
 		deviceInput: null,
 		camera: null,
 		player: null,
-		animationManager: null
+		animationManager: null,
+		objects: null
 	},
 	
 	frameCount: 0,
@@ -22,11 +23,13 @@ Ext.define('Game.game.Game', {
 	
 	constructor: function(config) {
 		this.initConfig(config);
+		this.objects = new Ext.util.MixedCollection();
 		this.callParent(arguments);
 		this.getCanvas().on('afterrender', this.init, this);
 	},
 	
 	init: function() {
+		this.initSockets();
 		this.initCanvas();
 		this.initCamera();
 		this.initDeviceInput();
@@ -35,6 +38,25 @@ Ext.define('Game.game.Game', {
 		this.initPlayer();
 		this.initSprites();
 		this.initGameLoop();
+	},
+	
+	initSockets: function() {
+		window.os.getModuleManager().register({
+			cls: 'Lapidos.node.client.module.Manager',
+			config: {
+				serverUrl: 'http://localhost:8080',
+				jsFile: 'http://localhost:8080/socket.io/socket.io.js'
+			}
+		});
+		window.os.getServiceManager().onReady('start', function(service) {
+			service.onConnect('game', function(client) {
+				console.log('Connected to socket');
+				this.client = client;
+				this.map.initSocketClient(this.client);
+			}, this);
+		}, this, {
+			name: 'socket-manager'
+		});
 	},
 	
 	initCanvas: function() {

@@ -75,9 +75,10 @@ Ext.define('Game.animation.Animate', {
 			this.clearAnimations();
 		}
 		
-		config.target = this;
 		if (!this.motion) {
-			this.motion = Ext.create('Game.animation.Motion', config);
+			this.motion = Ext.create('Game.animation.Motion', Ext.apply({
+				target: this
+			}, config));
 			this.motion.on({
 				scope: this,
 				start: this.onMotionStart,

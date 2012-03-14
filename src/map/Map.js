@@ -34,10 +34,7 @@ Ext.define('Game.map.Map', {
 	addSprite: function(sprite) {
 		sprite.initGame(this.game);
 		sprite.on('remove', function(sprite) {
-			console.log('remove');
-			console.log(this.sprites.items.length);
 			this.sprites.remove(sprite);
-			console.log(this.sprites.items.length);
 		}, this);
 		this.sprites.add(sprite.getId(), sprite);
 	},
@@ -66,6 +63,29 @@ Ext.define('Game.map.Map', {
 			boundX2: this.width,
 			boundY2: this.height
 		});
+	},
+	
+	initSocketClient: function(client) {
+		client.on('createSharedObject', function(client, so) {
+			this.game.objects.add(so.id, so);
+			this.addSprite(so);
+			
+		}, this);
+		
+		client.on('syncSharedObject', function(client, config) {
+			console.log('map sync');
+			
+			var so = this.game.objects.get(config.id);
+			Ext.apply(so, config);
+		}, this);
+		
+		client.on('callSharedMethod', function(client, config) {
+			console.log('calling shared');
+			var so = this.game.objects.get(config.id);
+			so[config.methodName].apply(so, config.args);
+		}, this);
+		
+		
 	},
 	
 	handleCollisions: function() {

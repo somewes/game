@@ -98,7 +98,17 @@ Ext.define('Game.sprite.Character', {
 	onKeyDownSpace: function() {
 //		this.jump();
 //		this.shootPixels();
-		this.attack(this.game.player2);
+		var sharedData = {
+			name: this.name,
+			src: this.src,
+			width: this.width,
+			height: this.height,
+			x: this.x,
+			y: this.y
+		};
+		this.createShared(this.game.client, sharedData);
+		
+//		this.callSharedMethod('attack', [this.game.player2]);
 	},
 	
 	shootPixels: function() {
@@ -175,14 +185,17 @@ Ext.define('Game.sprite.Character', {
 			
 		}
 		else {
-			this.startMotion({
+			this.callSharedMethod('startMotion', [{
 				xAcceleration: 5,
 				xVelocityMax: 3,
-				xVelocityStop: null
-			});
-			this.playSequence(Ext.create('Game.sprite.Sequence', {
-				sequence: [18,3,33,3]
-			}));
+				xVelocityStop: null,
+				xStart: this.x,
+				yStart: this.y
+			}]);
+			
+			this.callSharedMethod('createAndPlaySequence', [
+				[18,3,33,3]
+			]);
 		}
 	},
 	
@@ -191,10 +204,12 @@ Ext.define('Game.sprite.Character', {
 			this.onKeyDownLeft();
 		}
 		else {
-			this.startMotion({
+			this.callSharedMethod('startMotion', [{
 				xAcceleration: -3,
-				xVelocityStop: 0
-			});
+				xVelocityStop: 0,
+				xStart: this.x,
+				yStart: this.y
+			}]);
 		}
 	},
 	
@@ -203,14 +218,17 @@ Ext.define('Game.sprite.Character', {
 			
 		}
 		else {
-			this.startMotion({
+			this.callSharedMethod('startMotion', [{
 				xAcceleration: -5,
 				xVelocityMax: 3,
-				xVelocityStop: null
-			});
-			this.playSequence(Ext.create('Game.sprite.Sequence', {
-				sequence: [17,2,32,2]
-			}));
+				xVelocityStop: null,
+				xStart: this.x,
+				yStart: this.y
+			}]);
+			
+			this.callSharedMethod('createAndPlaySequence', [
+				[17,2,32,2]
+			]);
 		}
 	},
 	
@@ -219,10 +237,12 @@ Ext.define('Game.sprite.Character', {
 			this.onKeyDownRight()
 		}
 		else {
-			this.startMotion({
+			this.callSharedMethod('startMotion', [{
 				xAcceleration: 3,
-				xVelocityStop: 0
-			});
+				xVelocityStop: 0,
+				xStart: this.x,
+				yStart: this.y
+			}]);
 		}
 	},
 	
@@ -231,14 +251,17 @@ Ext.define('Game.sprite.Character', {
 			
 		}
 		else {
-			this.startMotion({
+			this.callSharedMethod('startMotion', [{
 				yAcceleration: -5,
 				yVelocityMax: 3,
-				yVelocityStop: null
-			});
-			this.playSequence(Ext.create('Game.sprite.Sequence', {
-				sequence: [16,1,31,1]
-			}));
+				yVelocityStop: null,
+				xStart: this.x,
+				yStart: this.y
+			}]);
+			
+			this.callSharedMethod('createAndPlaySequence', [
+				[16,1,31,1]
+			]);
 		}
 	},
 	
@@ -251,10 +274,12 @@ Ext.define('Game.sprite.Character', {
 				this.onKeyDownDown()
 			}
 			else {
-				this.startMotion({
+				this.callSharedMethod('startMotion', [{
 					yAcceleration: 3,
-					yVelocityStop: 0
-				});
+					yVelocityStop: 0,
+					xStart: this.x,
+					yStart: this.y
+				}]);
 			}
 		}
 	},
@@ -264,14 +289,15 @@ Ext.define('Game.sprite.Character', {
 			
 		}
 		else {
-			this.startMotion({
+			this.callSharedMethod('startMotion', [{
 				yAcceleration: 5,
 				yVelocityMax: 3,
 				yVelocityStop: null
-			});
-			this.playSequence(Ext.create('Game.sprite.Sequence', {
-				sequence: [15,0,30,0]
-			}));
+			}]);
+			
+			this.callSharedMethod('createAndPlaySequence', [
+				[15,0,30,0]
+			]);
 		}
 	},
 	
@@ -284,10 +310,12 @@ Ext.define('Game.sprite.Character', {
 				this.onKeyDownUp()
 			}
 			else {
-				this.startMotion({
+				this.callSharedMethod('startMotion', [{
 					yAcceleration: -3,
-					yVelocityStop: 0
-				});
+					yVelocityStop: 0,
+					xStart: this.x,
+					yStart: this.y
+				}]);
 			}
 		}
 	}

@@ -3,12 +3,14 @@ Ext.define('Game.sprite.Base', {
 	mixins: {
 		animate: 'Game.animation.Animate',
 		motion: 'Game.animation.Motion',
-		input: 'Game.input.Listener'
+		input: 'Game.input.Listener',
+		sharedObject: 'Lapidos.node.shared.Object'
 	},
 	requires: [
 		'Game.animation.Animate',
 		'Game.animation.Motion',
-		'Game.input.Listener'
+		'Game.input.Listener',
+		'Lapidos.node.shared.Object'
 	],
 	
 	config: {

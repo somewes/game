@@ -24,27 +24,54 @@ else {
 Ext.onReady(function() {
 	Ext.require([
 		'Lapidos.os.OS',
-		'Lapidos.shell.dom.Dom'
+		'Lapidos.shell.dom.Dom',
+		'Lapidos.shell.navigation.Dom',
+		'Game.module.Game'
 	], function() {
-		var os = new Lapidos.os.OS();
-		os.getModuleManager().on('launch', function() {
-			console.log('launch');
-			console.log(arguments);
-		}, this);
+		window.os = new Lapidos.os.OS();
+		
 		var shell = new Lapidos.shell.dom.Dom(os, {
 			
 		});
-		var gameInterface = Ext.create('Game.game.view.Interface', {
-			region: 'center',
-			title: 'Game'
+//		var gameInterface = Ext.create('Game.game.view.Interface', {
+//			region: 'center',
+//			title: 'Game'
+//		});
+		var centerPanel = new Ext.panel.Panel({
+			layout: 'card',
+			region: 'center'
+		});
+		var navigation = new Lapidos.shell.navigation.Dom({
+			region: 'north',
+			store: shell.getNavigationStore(),
+			height: 20
 		});
 		
 		var viewport = new Ext.Viewport({
 			layout: 'border',
 			items: [
-				gameInterface
+				navigation,
+				centerPanel
 			]
 		});
+		
+		os.getModuleManager().on('launch', function(manager, module, launchParams) {
+			if(Ext.isFunction(module.isViewable) && module.isViewable()){
+				centerPanel.setLoading('Loading ' + module.getName() + '...');
+				module.getActiveView(function(view){
+					centerPanel.setLoading(false);
+					centerPanel.add(view);
+					centerPanel.setActive(view);
+				}, this);
+			}
+		}, this);
+		
+		var modules = [
+			'Game.module.Game'
+		];
+		os.getModuleManager().register(modules);
+		var gameModule = os.getModuleManager().getInstance('game');
+		gameModule.launch();
 	});
 
 	

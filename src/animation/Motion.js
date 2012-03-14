@@ -1,5 +1,8 @@
 Ext.define('Game.animation.Motion', {
 	extend: 'Ext.util.Observable',
+	requires: [
+		'Lapidos.node.shared.Object'
+	],
 	
 	config: {
 		target: null,
@@ -43,6 +46,12 @@ Ext.define('Game.animation.Motion', {
 		this.initialXVelocity = this.xVelocity;
 		this.initialYVelocity = this.yVelocity;
 		
+		if (config.xStart) {
+			this.target.x = config.xStart;
+		}
+		if (config.yStart) {
+			this.target.y = config.yStart;
+		}
 		this.xStart = this.target.x;
 		this.yStart = this.target.y;
 		
