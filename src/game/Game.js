@@ -1,7 +1,8 @@
 Ext.define('Game.game.Game', {
 	extend: 'Ext.util.Observable',
 	requires: [
-		'Game.animation.Manager'
+		'Game.animation.Manager',
+		'Game.canvas.Manager',
 	],
 	
 	config: {
@@ -14,12 +15,12 @@ Ext.define('Game.game.Game', {
 		deviceInput: null,
 		camera: null,
 		player: null,
+		canvasManager: null,
 		animationManager: null,
 		objects: null
 	},
 	
 	frameCount: 0,
-	ignoreUserInput: false,
 	
 	constructor: function(config) {
 		this.initConfig(config);
@@ -29,13 +30,15 @@ Ext.define('Game.game.Game', {
 	},
 	
 	init: function() {
-		this.initSockets();
+//		this.initSockets();
 		this.initCanvas();
 		this.initCamera();
 		this.initDeviceInput();
+		this.initCanvasManager();
 		this.initAnimationManager();
-		this.initMap();
 		this.initPlayer();
+		this.initMap();
+		window.game = this;
 		this.initSprites();
 		this.initGameLoop();
 	},
@@ -81,8 +84,12 @@ Ext.define('Game.game.Game', {
 		}));
 	},
 	
+	initCanvasManager: function() {
+		this.setCanvasManager(new Game.canvas.Manager());
+	},
+	
 	initAnimationManager: function() {
-		this.animationManager = new Game.animation.Manager();
+		this.setAnimationManager(new Game.animation.Manager());
 	},
 	
 	initMap: function() {
@@ -90,11 +97,31 @@ Ext.define('Game.game.Game', {
 //			tileSheet: '/modules/wes/img/sprites/maps/jidoor/sheet_new.png',
 //			game: this
 //		});
-		this.map = Ext.create('Game.map.Debug', {
-			width: 1000,
-			height: 1000,
-			game: this
-		});
+		if (this.map) {
+			this.setMap(Ext.create('Game.map.Debug', {
+				width: 1000,
+				height: 1000,
+				game: this,
+				hidden: false
+			}));
+		}
+		else {
+			this.setMap(Ext.create('Game.map.Debug2', {
+				width: 1000,
+				height: 1000,
+				game: this,
+				hidden: false
+			}));
+		}
+		this.map.checkIfReady();
+	},
+	
+	setMap: function(map) {
+		if (this.map) {
+			this.map.destroy();
+			delete this.map;
+		}
+		this.map = map;
 		this.map.checkIfReady();
 	},
 	
@@ -107,32 +134,7 @@ Ext.define('Game.game.Game', {
 			height: 48,
 			src: '/modules/wes/img/sprites/players/mog.png'
 		});
-		this.player2 = Ext.create('Game.sprite.Character', {
-			name: 'Gogo',
-			x: 0,
-			y: 0,
-			width: 32,
-			height: 48,
-			src: '/modules/wes/img/sprites/players/gogo.png'
-		});
-		
 		this.player.acceptInput(this.getDeviceInput());
-		this.map.addSprite(this.player);
-		this.camera.follow(this.player);
-		this.map.addSprite(this.player2);
-		this.player2.animate({
-			duration: 2000,
-			to: {
-				x: 100,
-				y: 100
-			}
-		});
-		
-		var sword = Ext.create('Game.gear.Sword');
-		this.player.equip(sword, 'rightHand');
-//		this.player.attack(this.player2);
-//		this.player.attack(this.player2);
-//		this.player.attack(this.player2);
 	},
 	
 	initSprites: function() {
@@ -175,15 +177,21 @@ Ext.define('Game.game.Game', {
 	updatePositions: function() {
 		var currentTime = (new Date()).getTime();
 		this.animationManager.updatePositions(currentTime);
-		this.map.handleCollisions();
+//		this.map.handleCollisions();
 		this.camera.updatePosition(currentTime);
 	},
 	
 	draw: function() {
-		this.map.draw();
+		var cm = this.getCanvasManager();
+		var numItems = cm.getNumItems();
+		var items = cm.getItems().items;
+		for (var i = 0; i < numItems; i++) {
+			if (items[i].hidden === false) {
+				items[i].draw();
+			}
+		}
 	}
 	
 });
 
 // map needs a base class that is empty so we can test configs like mode for sidescrolling or overhead view
-// sprites need to be a mixed collection in the map class so we can loop through an array and also look up the sprites by object to remove them

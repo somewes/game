@@ -45,7 +45,7 @@ Ext.define('Game.sprite.Character', {
 	},
 	
 	attack: function(target) {
-		console.log(this.name + ' attacked ' + target.name);
+//		console.log(this.name + ' attacked ' + target.name);
 		var damage = this.equipment.getWeapon().getDamage();
 		damage = target.defend(damage)
 		
@@ -105,7 +105,7 @@ Ext.define('Game.sprite.Character', {
 //		console.log('Damage started at ' + damage);
 		damage -= damage * this.strength / 100;
 		damage = Math.round(damage);
-		console.log(this.name + ' was hit for ' + damage);
+//		console.log(this.name + ' was hit for ' + damage);
 		return damage;
 	},
 	
@@ -122,7 +122,7 @@ Ext.define('Game.sprite.Character', {
 //		};
 //		this.createShared(this.game.client, sharedData);
 		
-		this.callSharedMethod('attack', [this.game.player2]);
+		this.callSharedMethod('attack', [this.game.map.player2]);
 	},
 	
 	shootPixels: function() {

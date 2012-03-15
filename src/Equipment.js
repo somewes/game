@@ -18,6 +18,8 @@ Ext.define('Game.Equipment', {
 	
 	constructor: function(config) {
 		this.initConfig(config);
+		var weapon = Ext.create('Game.gear.Weapon');
+		this.equip(weapon, 'rightHand');
 		this.callParent(arguments);
 		
 	},

@@ -1,8 +1,7 @@
 Ext.define('Game.map.Map', {
-	extend: 'Ext.util.Observable',
+	extend: 'Game.canvas.Canvas',
 	
 	config: {
-		game: null,
 		isReady: false,
 		
 		spawnX: 0,
@@ -20,15 +19,17 @@ Ext.define('Game.map.Map', {
 	},
 	
 	constructor: function(config) {
-		this.initConfig(config);
-		this.sprites = new Ext.util.MixedCollection();
 		this.callParent(arguments);
-		this.context = this.game.context;
+		this.on('mapready', this.onMapReady, this);
+		this.sprites = new Ext.util.MixedCollection();
+		this.checkIfReady();
 	},
 	
 	checkIfReady: function() {
-		this.isReady = true;
-		this.setGameDetails();
+		if (true) {
+			this.fireEvent('mapready', this);
+			this.isReady = true;
+		}
 	},
 	
 	addSprite: function(sprite) {
@@ -44,6 +45,15 @@ Ext.define('Game.map.Map', {
 			return;
 		}
 		
+		this.drawBg();
+		this.drawSprites();
+	},
+	
+	drawBg: function() {
+		
+	},
+	
+	drawSprites: function() {
 		var items = this.sprites.items;
 		items.sort(this.sortByY);
 		var numSprites = items.length;
@@ -56,13 +66,46 @@ Ext.define('Game.map.Map', {
 		return a.y - b.y;
 	},
 	
-	setGameDetails: function() {
+	onMapReady: function() {
+		this.initCamera();
+		this.initPlayer();
+	},
+	
+	initCamera: function() {
 		this.game.camera.setBounds({
 			boundX: 0,
 			boundY: 0,
 			boundX2: this.width,
 			boundY2: this.height
 		});
+		this.game.camera.follow(this.game.player);
+	},
+	
+	initPlayer: function() {
+		this.addSprite(this.game.player);
+		this.game.player.setX(this.getSpawnX());
+		this.game.player.setY(this.getSpawnY());
+		this.game.player.inputDevice.enable();
+		
+		this.player2 = Ext.create('Game.sprite.Character', {
+			name: 'Gogo',
+			x: 0,
+			y: 0,
+			width: 32,
+			height: 48,
+			src: '/modules/wes/img/sprites/players/gogo.png'
+		});
+		this.addSprite(this.player2);
+		this.player2.animate({
+			duration: 2000,
+			to: {
+				x: 100,
+				y: 100
+			}
+		});
+//		var sword = Ext.create('Game.gear.Sword');
+//		this.game.player.equip(sword, 'rightHand');
+//		
 	},
 	
 	initSocketClient: function(client) {
@@ -94,6 +137,20 @@ Ext.define('Game.map.Map', {
 //		for (var i = 0; i < numSprites; i++) {
 //			
 //		}
+	},
+	
+	destroy: function() {
+		// Remove player from current map
+		this.sprites.remove(this.game.player);
+		
+		// Hide the map
+		this.setHidden(true);
+		
+		this.fireEvent('destroy', this);
+		
+		// Stop all listeners
+		this.clearListeners();
+		
 	}
 	
 });

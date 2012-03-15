@@ -9,11 +9,6 @@ Ext.define('Game.input.Keyboard', {
 			left: 65,
 			space: 32
 		}
-	},
-	
-	initControls: function() {
-		Ext.get(document).on('keydown', this.onKeyDown, this);
-		Ext.get(document).on('keyup', this.onKeyUp, this);
 	}
 	
 });

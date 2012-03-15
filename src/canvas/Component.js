@@ -1,4 +1,4 @@
-Ext.define('Game.game.Canvas', {
+Ext.define('Game.canvas.Component', {
 	extend: 'Ext.Component',
 	autoEl: {
 		tag: 'canvas'

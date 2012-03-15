@@ -13,7 +13,7 @@ Ext.define('Game.game.view.Interface', {
 	},
 	
 	initCanvas: function() {
-		this.canvas = Ext.create('Game.game.Canvas');
+		this.canvas = Ext.create('Game.canvas.Component');
 		this.items.push(this.canvas);
 	},
 	
