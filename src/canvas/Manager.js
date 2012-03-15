@@ -19,13 +19,16 @@ Ext.define('Game.canvas.Manager', {
 		item.on('destroy', this.remove, this);
 		this.items.add(item.id, item);
 		this.numItems = this.items.items.length;
+		this.items.sortBy(this.sortByZ);
 	},
 	
 	remove: function(item) {
-		console.log('map destroyed so remove it');
 		this.items.remove(item);
 		this.numItems = this.items.items.length;
-		console.log(this.numItems);
+	},
+	
+	sortByZ: function(a, b) {
+		return a.z - b.z;
 	}
 	
 });

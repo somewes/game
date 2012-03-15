@@ -8,7 +8,8 @@ Ext.define('Game.canvas.Canvas', {
 		game: null,
 		id: false,
 		hidden: true,
-		context: null
+		context: null,
+		z: 0
 	},
 	
 	constructor: function(config) {

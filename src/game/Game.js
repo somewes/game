@@ -113,6 +113,7 @@ Ext.define('Game.game.Game', {
 				hidden: false
 			}));
 		}
+		
 		this.map.checkIfReady();
 	},
 	
