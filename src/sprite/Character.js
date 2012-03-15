@@ -127,7 +127,7 @@ Ext.define('Game.sprite.Character', {
 	},
 	
 	die: function() {
-		console.log('die');
+		this.life = this.maxLife;
 	},
 	
 	onKeyDownSpace: function() {
