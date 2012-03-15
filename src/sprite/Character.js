@@ -44,6 +44,14 @@ Ext.define('Game.sprite.Character', {
 		return Math.sqrt( xs + ys );
 	},
 	
+	getLifePercent: function() {
+		return this.life / this.maxLife;
+	},
+	
+	getManaPercent: function() {
+		return this.mana / this.maxMana;
+	},
+	
 	attack: function(target) {
 //		console.log(this.name + ' attacked ' + target.name);
 		var damage = this.equipment.getWeapon().getDamage();
@@ -65,7 +73,7 @@ Ext.define('Game.sprite.Character', {
 				y: target.y - 150
 			}
 		}).on('stop', function() {
-			this.showDamageText(damage, target);
+			target.receiveDamage(damage);
 		}, this);
 		
 		this.animate({
@@ -109,6 +117,19 @@ Ext.define('Game.sprite.Character', {
 		return damage;
 	},
 	
+	receiveDamage: function(damage) {
+		this.showDamageText(damage, this);
+		this.life -= damage;
+		if (this.life < 0) {
+			this.life = 0;
+			this.die();
+		}
+	},
+	
+	die: function() {
+		console.log('die');
+	},
+	
 	onKeyDownSpace: function() {
 //		this.jump();
 //		this.shootPixels();
@@ -122,7 +143,8 @@ Ext.define('Game.sprite.Character', {
 //		};
 //		this.createShared(this.game.client, sharedData);
 		
-		this.callSharedMethod('attack', [this.game.map.player2]);
+//		this.callSharedMethod('attack', [this.game.map.player2]);
+		this.game.map.player2.attack(this);
 	},
 	
 	onKeyDownF3: function() {

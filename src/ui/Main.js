@@ -2,155 +2,59 @@ Ext.define('Game.ui.Main', {
 	extend: 'Game.canvas.Canvas',
 	
 	config: {
-		isReady: false,
-		
-		spawnX: 0,
-		spawnY: 0,
-		spawnZ: 0,
-		
-		width: 0,
-		height: 0,
-		
-		type: 'overhead', // overhead or sidescroller
-		gravity: 5,
-		gravityDirection: 'down',
-		
-		sprites: null
+		twoPi: 0,
+		circleY: 0,
+		radius: 30,
+		halfRadius: 0,
+		lifeX: 0,
+		lifeY: 0,
+		manaX: 0,
+		manaY: 0
 	},
 	
-	constructor: function(config) {
+	constructor: function() {
 		this.callParent(arguments);
-		this.on('mapready', this.onMapReady, this);
-		this.sprites = new Ext.util.MixedCollection();
-		this.checkIfReady();
-	},
-	
-	checkIfReady: function() {
-		if (true) {
-			this.fireEvent('mapready', this);
-			this.isReady = true;
-		}
-	},
-	
-	addSprite: function(sprite) {
-		sprite.initGame(this.game);
-		sprite.on('remove', function(sprite) {
-			this.sprites.remove(sprite);
-		}, this);
-		this.sprites.add(sprite.getId(), sprite);
+		this.camera = this.game.camera;
+		this.twoPi = Math.PI * 2;
+		this.halfRadius = this.radius / 2;
+		this.lifeX = this.radius;
+		this.lifeY = this.camera.height - this.radius;
+		this.manaX = this.camera.width - this.radius;
+		this.manaY = this.camera.height - this.radius;
 	},
 	
 	draw: function() {
-		if (!this.isReady) {
-			return;
-		}
+		var player = this.game.player;
+		this.context.save();
+		this.context.translate(this.camera.x, this.camera.y);
 		
-		this.drawBg();
-		this.drawSprites();
-	},
-	
-	drawBg: function() {
+		// Draw life
+		this.context.beginPath();
 		
-	},
-	
-	drawSprites: function() {
-		var items = this.sprites.items;
-		items.sort(this.sortByY);
-		var numSprites = items.length;
-		for (var i = 0; i < numSprites; i++) {
-			items[i].draw();
-		}
-	},
-	
-	sortByY: function(a, b) {
-		return a.y - b.y;
-	},
-	
-	onMapReady: function() {
-		this.initCamera();
-		this.initPlayer();
-	},
-	
-	initCamera: function() {
-		this.game.camera.setBounds({
-			boundX: 0,
-			boundY: 0,
-			boundX2: this.width,
-			boundY2: this.height
-		});
-		this.game.camera.follow(this.game.player);
-	},
-	
-	initPlayer: function() {
-		this.addSprite(this.game.player);
-		this.game.player.setX(this.getSpawnX());
-		this.game.player.setY(this.getSpawnY());
-		this.game.player.inputDevice.enable();
+//		this.context.arc(this.lifeX, this.lifeY, this.radius, 0, this.twoPi, true);
+		var startX = 400;
+		var lostX = (this.height - startX) * player.getLifePercent();
+		var gradient = this.context.createLinearGradient(40, 400, 0, this.height);
+		gradient.addColorStop(0, "#FF001D");
+		gradient.addColorStop(1, "#780006");
+		this.context.fillStyle = gradient;
+		this.context.fillRect(0, this.height - lostX, 40, this.height);
+//		this.context.closePath();
+//		this.context.fill();
 		
-		this.player2 = Ext.create('Game.sprite.Character', {
-			name: 'Gogo',
-			x: 0,
-			y: 0,
-			width: 32,
-			height: 48,
-			src: '/modules/wes/img/sprites/players/gogo.png'
-		});
-		this.addSprite(this.player2);
-		this.player2.animate({
-			duration: 2000,
-			to: {
-				x: 100,
-				y: 100
-			}
-		});
-//		var sword = Ext.create('Game.gear.Sword');
-//		this.game.player.equip(sword, 'rightHand');
-//		
-	},
-	
-	initSocketClient: function(client) {
-		client.on('createSharedObject', function(client, so) {
-			this.game.objects.add(so.id, so);
-			this.addSprite(so);
-			
-		}, this);
+		// Draw mana
+//		this.context.beginPath();
+//		this.context.arc(this.manaX, this.manaY, this.radius, 0, this.twoPi, true);
+//		this.context.closePath();
+		lostX = (this.height - startX) * player.getManaPercent();
+		gradient = this.context.createLinearGradient(600, 400, this.width, this.height);
+		gradient.addColorStop(0, "#8ED6FF");
+		gradient.addColorStop(1, "#004CB3");
+		this.context.fillStyle = gradient;
+		this.context.fillRect(600, this.height - lostX, this.width, this.height);
+//		this.context.fill();
 		
-		client.on('syncSharedObject', function(client, config) {
-			console.log('map sync');
-			
-			var so = this.game.objects.get(config.id);
-			Ext.apply(so, config);
-		}, this);
-		
-		client.on('callSharedMethod', function(client, config) {
-			console.log('calling shared');
-			var so = this.game.objects.get(config.id);
-			so[config.methodName].apply(so, config.args);
-		}, this);
-		
-		
-	},
-	
-	handleCollisions: function() {
-//		var items = this.sprites.items;
-//		var numSprites = items.length;
-//		for (var i = 0; i < numSprites; i++) {
-//			
-//		}
-	},
-	
-	destroy: function() {
-		// Remove player from current map
-		this.sprites.remove(this.game.player);
-		
-		// Hide the map
-		this.setHidden(true);
-		
-		this.fireEvent('destroy', this);
-		
-		// Stop all listeners
-		this.clearListeners();
-		
+		this.context.restore();
 	}
 	
 });

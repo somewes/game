@@ -26,7 +26,7 @@ Ext.define('Game.map.Map', {
 	},
 	
 	checkIfReady: function() {
-		if (true) {
+		if (true && !this.isReady) {
 			this.fireEvent('mapready', this);
 			this.isReady = true;
 		}
@@ -103,8 +103,12 @@ Ext.define('Game.map.Map', {
 				y: 100
 			}
 		});
-//		var sword = Ext.create('Game.gear.Sword');
-//		this.game.player.equip(sword, 'rightHand');
+		var sword = Ext.create('Game.gear.Sword', {
+			minDamage: 10,
+			maxDamage: 20
+		});
+		this.game.player.equip(sword, 'rightHand');
+		this.player2.equip(sword, 'rightHand');
 	},
 	
 	initSocketClient: function(client) {

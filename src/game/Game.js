@@ -129,7 +129,10 @@ Ext.define('Game.game.Game', {
 	},
 	
 	initMainUi: function() {
-		this.mainUi = '';
+		this.mainUi = Ext.create('Game.ui.Main', {
+			game: this,
+			hidden: false
+		});
 	},
 	
 	initDebugUi: function() {
@@ -146,9 +149,14 @@ Ext.define('Game.game.Game', {
 			y: 0,
 			width: 32,
 			height: 48,
+			life: 50,
+			maxLife: 50,
+			mana: 25,
+			maxMana: 25,
 			src: '/modules/wes/img/sprites/players/mog.png'
 		});
 		this.player.acceptInput(this.getDeviceInput());
+		window.player = this.player;
 	},
 	
 	initSprites: function() {
