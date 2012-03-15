@@ -28,7 +28,11 @@ Ext.define('Game.input.Listener', {
 			keyupdown: this.onKeyUpDown,
 			
 			keydownleft: this.onKeyDownLeft,
-			keyupleft: this.onKeyUpLeft
+			keyupleft: this.onKeyUpLeft,
+			
+			keydownf3: this.onKeyDownF3,
+			keyupf3: this.onKeyUpF3
+			
 		});
 	},
 	
@@ -47,7 +51,9 @@ Ext.define('Game.input.Listener', {
 	onKeyDownDown: Ext.emptyFn,
 	onKeyUpDown: Ext.emptyFn,
 	onKeyDownLeft: Ext.emptyFn,
-	onKeyUpLeft: Ext.emptyFn
+	onKeyUpLeft: Ext.emptyFn,
+	onKeyDownF3: Ext.emptyFn,
+	onKeyUpF3: Ext.emptyFn,
 	
 	
 });

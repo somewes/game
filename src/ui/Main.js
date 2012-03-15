@@ -1,4 +1,4 @@
-Ext.define('Game.map.Map', {
+Ext.define('Game.ui.Main', {
 	extend: 'Game.canvas.Canvas',
 	
 	config: {
@@ -105,6 +105,7 @@ Ext.define('Game.map.Map', {
 		});
 //		var sword = Ext.create('Game.gear.Sword');
 //		this.game.player.equip(sword, 'rightHand');
+//		
 	},
 	
 	initSocketClient: function(client) {

@@ -47,6 +47,7 @@ Ext.define('Game.input.Input', {
 		if (!this.acceptInput) {
 			return;
 		}
+		
 		// Do not keep firing the key down event for the same key
 		if (this.keysPressed[this.keyMap[e.keyCode]] === true) {
 			return;

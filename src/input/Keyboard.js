@@ -7,7 +7,8 @@ Ext.define('Game.input.Keyboard', {
 			right: 68,
 			down: 83,
 			left: 65,
-			space: 32
+			space: 32,
+			f3: 114
 		}
 	}
 	

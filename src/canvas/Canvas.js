@@ -27,6 +27,10 @@ Ext.define('Game.canvas.Canvas', {
 	
 	draw: function() {
 		
+	},
+	
+	toggleHidden: function() {
+		this.setHidden(!this.getHidden());
 	}
 	
 });

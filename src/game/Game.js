@@ -38,6 +38,8 @@ Ext.define('Game.game.Game', {
 		this.initAnimationManager();
 		this.initPlayer();
 		this.initMap();
+		this.initMainUi();
+		this.initDebugUi();
 		window.game = this;
 		this.initSprites();
 		this.initGameLoop();
@@ -124,6 +126,17 @@ Ext.define('Game.game.Game', {
 		}
 		this.map = map;
 		this.map.checkIfReady();
+	},
+	
+	initMainUi: function() {
+		this.mainUi = '';
+	},
+	
+	initDebugUi: function() {
+		this.debugUi = Ext.create('Game.ui.Debug', {
+			game: this,
+			hidden: true
+		});
 	},
 	
 	initPlayer: function() {

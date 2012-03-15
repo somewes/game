@@ -125,6 +125,10 @@ Ext.define('Game.sprite.Character', {
 		this.callSharedMethod('attack', [this.game.map.player2]);
 	},
 	
+	onKeyDownF3: function() {
+		this.game.debugUi.toggleHidden();
+	},
+	
 	shootPixels: function() {
 		var numPixels = 50;
 		for (var i = 0; i < numPixels; i++) {
