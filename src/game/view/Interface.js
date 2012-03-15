@@ -1,5 +1,9 @@
 Ext.define('Game.game.view.Interface', {
 	extend: 'Ext.panel.Panel',
+	requires: [
+		'Game.canvas.Component',
+		'Game.game.Game'
+	],
 	
 	initComponent: function() {
 		this.items = this.items || [];
@@ -13,12 +17,12 @@ Ext.define('Game.game.view.Interface', {
 	},
 	
 	initCanvas: function() {
-		this.canvas = Ext.create('Game.canvas.Component');
+		this.canvas = new Game.canvas.Component();
 		this.items.push(this.canvas);
 	},
 	
 	initGame: function() {
-		this.game = Ext.create('Game.game.Game', {
+		this.game = new Game.game.Game({
 			canvas: this.canvas
 		});
 	}

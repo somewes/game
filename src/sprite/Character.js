@@ -1,5 +1,11 @@
 Ext.define('Game.sprite.Character', {
 	extend: 'Game.sprite.Sprite',
+	requires: [
+		'Game.Equipment',
+		'Game.Inventory',
+		'Game.sprite.DamageText',
+		'Game.sprite.Base'
+	],
 	
 	config: {
 		name: '',
@@ -21,10 +27,10 @@ Ext.define('Game.sprite.Character', {
 	constructor: function(config) {
 		this.initConfig(config);
 		this.callParent(arguments);
-		this.equipment = Ext.create('Game.Equipment', {
+		this.equipment = new Game.Equipment({
 			character: this
 		});
-		this.inventory = Ext.create('Game.Inventory', {
+		this.inventory = new Game.Inventory({
 			character: this
 		});
 	},
@@ -86,7 +92,7 @@ Ext.define('Game.sprite.Character', {
 	},
 	
 	showDamageText: function(damage, target) {
-		var damageText = Ext.create('Game.sprite.DamageText', {
+		var damageText = new Game.sprite.DamageText({
 			damage: damage,
 			following: target,
 			x: target.x,
@@ -157,7 +163,7 @@ Ext.define('Game.sprite.Character', {
 			var hex = this.getRandomHex();
 			var xVelocity = this.randy(-5, 5);
 			var yVelocity = this.randy(-5, 5);
-			var one = Ext.create('Game.sprite.Base', {
+			var one = new Game.sprite.Base({
 				width: 5,
 				height: 5,
 				color: hex,
@@ -165,7 +171,7 @@ Ext.define('Game.sprite.Character', {
 				y: this.y + this.halfHeight
 			});
 			
-			var two = Ext.create('Game.sprite.Base', {
+			var two = new Game.sprite.Base({
 				width: 4,
 				height: 4,
 				color: hex,
@@ -173,7 +179,7 @@ Ext.define('Game.sprite.Character', {
 				y: one.y
 			});
 			
-			var three = Ext.create('Game.sprite.Base', {
+			var three = new Game.sprite.Base({
 				width: 3,
 				height: 3,
 				color: hex,

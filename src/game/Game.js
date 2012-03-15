@@ -3,6 +3,15 @@ Ext.define('Game.game.Game', {
 	requires: [
 		'Game.animation.Manager',
 		'Game.canvas.Manager',
+		'Game.Camera',
+		'Game.input.Keyboard',
+		'Game.map.Tile',
+		'Game.map.Debug',
+		'Game.map.Debug2',
+		'Game.ui.Main',
+		'Game.ui.Debug',
+		'Game.sprite.Character',
+		'Game.sprite.Base'
 	],
 	
 	config: {
@@ -71,7 +80,7 @@ Ext.define('Game.game.Game', {
 	},
 	
 	initCamera: function() {
-		this.setCamera(Ext.create('Game.Camera', {
+		this.setCamera(new Game.Camera({
 			width: this.getWidth(),
 			height: this.getHeight()
 		}));
@@ -81,7 +90,7 @@ Ext.define('Game.game.Game', {
 	},
 	
 	initDeviceInput: function() {
-		this.setDeviceInput(Ext.create('Game.input.Keyboard', {
+		this.setDeviceInput(new Game.input.Keyboard({
 			game: this
 		}));
 	},
@@ -95,12 +104,12 @@ Ext.define('Game.game.Game', {
 	},
 	
 	initMap: function() {
-//		this.map = Ext.create('Game.map.Tile', {
+//		this.map = new Game.map.Tile({
 //			tileSheet: '/modules/wes/img/sprites/maps/jidoor/sheet_new.png',
 //			game: this
 //		});
 		if (this.map) {
-			this.setMap(Ext.create('Game.map.Debug', {
+			this.setMap(new Game.map.Debug({
 				width: 1000,
 				height: 1000,
 				game: this,
@@ -108,7 +117,7 @@ Ext.define('Game.game.Game', {
 			}));
 		}
 		else {
-			this.setMap(Ext.create('Game.map.Debug2', {
+			this.setMap(new Game.map.Debug2({
 				width: 1000,
 				height: 1000,
 				game: this,
@@ -129,21 +138,21 @@ Ext.define('Game.game.Game', {
 	},
 	
 	initMainUi: function() {
-		this.mainUi = Ext.create('Game.ui.Main', {
+		this.mainUi = new Game.ui.Main({
 			game: this,
 			hidden: false
 		});
 	},
 	
 	initDebugUi: function() {
-		this.debugUi = Ext.create('Game.ui.Debug', {
+		this.debugUi = new Game.ui.Debug({
 			game: this,
 			hidden: true
 		});
 	},
 	
 	initPlayer: function() {
-		this.player = Ext.create('Game.sprite.Character', {
+		this.player = new Game.sprite.Character({
 			name: 'Mog',
 			x: 0,
 			y: 0,
@@ -162,7 +171,7 @@ Ext.define('Game.game.Game', {
 	initSprites: function() {
 		var num = 0;
 		for (var i = 0; i < num; i++) {
-			this.map.addSprite(Ext.create('Game.sprite.Base', {
+			this.map.addSprite(new Game.sprite.Base({
 				randomize: true
 			}));
 		}

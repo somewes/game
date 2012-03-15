@@ -1,5 +1,8 @@
 Ext.define('Game.sprite.Sprite', {
 	extend: 'Game.sprite.Base',
+	requires: [
+		'Game.sprite.Sequence'
+	],
 	
 	config: {
 		img: null,
@@ -57,7 +60,7 @@ Ext.define('Game.sprite.Sprite', {
 	},
 	
 	createAndPlaySequence: function(frameArray) {
-		this.playSequence(Ext.create('Game.sprite.Sequence', {
+		this.playSequence(new Game.sprite.Sequence({
 			sequence: frameArray
 		}));
 	},

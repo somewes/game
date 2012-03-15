@@ -1,5 +1,9 @@
 Ext.define('Game.map.Map', {
 	extend: 'Game.canvas.Canvas',
+	requires: [
+		'Game.sprite.Character',
+		'Game.gear.Sword'
+	],
 	
 	config: {
 		isReady: false,
@@ -87,7 +91,7 @@ Ext.define('Game.map.Map', {
 		this.game.player.setY(this.getSpawnY());
 		this.game.player.inputDevice.enable();
 		
-		this.player2 = Ext.create('Game.sprite.Character', {
+		this.player2 = new Game.sprite.Character({
 			name: 'Gogo',
 			x: 0,
 			y: 0,
@@ -103,7 +107,7 @@ Ext.define('Game.map.Map', {
 				y: 100
 			}
 		});
-		var sword = Ext.create('Game.gear.Sword', {
+		var sword = new Game.gear.Sword({
 			minDamage: 10,
 			maxDamage: 20
 		});

@@ -1,5 +1,9 @@
 Ext.define('Game.animation.Animate', {
 	extend: 'Ext.util.Observable',
+	requires: [
+		'Game.animation.Animation',
+		'Game.animation.Motion'
+	],
 	
 	config: {
 		animation: null,
@@ -18,7 +22,7 @@ Ext.define('Game.animation.Animate', {
 		config.target = this;
 		
 		// Create the animation
-		var animation = Ext.create('Game.animation.Animation', config);
+		var animation = new Game.animation.Animation(config);
 		animation.on({
 			scope: this,
 			start: this.onAnimationStart,
@@ -76,7 +80,7 @@ Ext.define('Game.animation.Animate', {
 		}
 		
 		if (!this.motion) {
-			this.motion = Ext.create('Game.animation.Motion', Ext.apply({
+			this.motion = new Game.animation.Motion(Ext.apply({
 				target: this
 			}, config));
 			this.motion.on({

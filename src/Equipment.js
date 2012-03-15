@@ -1,5 +1,8 @@
 Ext.define('Game.Equipment', {
 	extend: 'Ext.util.Observable',
+	requires: [
+		'Game.gear.Weapon'
+	],
 	
 	config: {
 		character: null,
@@ -18,7 +21,7 @@ Ext.define('Game.Equipment', {
 	
 	constructor: function(config) {
 		this.initConfig(config);
-		var weapon = Ext.create('Game.gear.Weapon');
+		var weapon = new Game.gear.Weapon();
 		this.equip(weapon, 'rightHand');
 		this.callParent(arguments);
 		

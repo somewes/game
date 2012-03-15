@@ -1,5 +1,8 @@
 Ext.define('Game.input.Listener', {
 	extend: 'Ext.util.Observable',
+	requires: [
+		'Game.sprite.Base'
+	],
 	
 	config: {
 		inputDevices: [],
@@ -37,7 +40,7 @@ Ext.define('Game.input.Listener', {
 	},
 	
 	onKeyDownSpace2: function() {
-		this.game.addSprite(Ext.create('Game.sprite.Base', {
+		this.game.addSprite(new Game.sprite.Base({
 			randomize: true
 		}));
 	},
