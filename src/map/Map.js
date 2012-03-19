@@ -90,29 +90,6 @@ Ext.define('Game.map.Map', {
 		this.game.player.setX(this.getSpawnX());
 		this.game.player.setY(this.getSpawnY());
 		this.game.player.inputDevice.enable();
-		
-		this.player2 = new Game.sprite.Character({
-			name: 'Gogo',
-			x: 0,
-			y: 0,
-			width: 32,
-			height: 48,
-			src: '/modules/wes/img/sprites/players/gogo.png'
-		});
-		this.addSprite(this.player2);
-		this.player2.animate({
-			duration: 2000,
-			to: {
-				x: 100,
-				y: 100
-			}
-		});
-		var sword = new Game.gear.Sword({
-			minDamage: 10,
-			maxDamage: 20
-		});
-		this.game.player.equip(sword, 'rightHand');
-		this.player2.equip(sword, 'rightHand');
 	},
 	
 	initSocketClient: function(client) {

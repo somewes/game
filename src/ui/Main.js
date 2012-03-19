@@ -1,5 +1,5 @@
 Ext.define('Game.ui.Main', {
-	extend: 'Game.canvas.Canvas',
+	extend: 'Game.ui.Base',
 	
 	config: {
 		twoPi: 0,
@@ -14,7 +14,6 @@ Ext.define('Game.ui.Main', {
 	
 	constructor: function() {
 		this.callParent(arguments);
-		this.camera = this.game.camera;
 		this.twoPi = Math.PI * 2;
 		this.halfRadius = this.radius / 2;
 		this.lifeX = this.radius;
@@ -23,10 +22,8 @@ Ext.define('Game.ui.Main', {
 		this.manaY = this.camera.height - this.radius;
 	},
 	
-	draw: function() {
+	drawUi: function() {
 		var player = this.game.player;
-		this.context.save();
-		this.context.translate(this.camera.x, this.camera.y);
 		
 		// Draw life
 		this.context.beginPath();
@@ -53,8 +50,6 @@ Ext.define('Game.ui.Main', {
 		this.context.fillStyle = gradient;
 		this.context.fillRect(600, this.height - lostX, this.width, this.height);
 //		this.context.fill();
-		
-		this.context.restore();
 	}
 	
 });

@@ -1,7 +1,7 @@
 Ext.define('Game.input.Listener', {
 	extend: 'Ext.util.Observable',
 	requires: [
-		'Game.sprite.Base'
+//		'Game.sprite.Base'
 	],
 	
 	config: {

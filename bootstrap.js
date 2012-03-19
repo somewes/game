@@ -29,7 +29,6 @@ Ext.onReady(function() {
 		'Game.module.Game'
 	], function() {
 		window.os = new Lapidos.os.Os();
-		
 		var shell = new Lapidos.shell.dom.Dom(os, {
 			
 		});

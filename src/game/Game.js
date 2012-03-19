@@ -11,7 +11,8 @@ Ext.define('Game.game.Game', {
 		'Game.ui.Main',
 		'Game.ui.Debug',
 		'Game.sprite.Character',
-		'Game.sprite.Base'
+		'Game.sprite.Base',
+		'Game.battle.Battle'
 	],
 	
 	config: {
@@ -36,6 +37,36 @@ Ext.define('Game.game.Game', {
 		this.objects = new Ext.util.MixedCollection();
 		this.callParent(arguments);
 		this.getCanvas().on('afterrender', this.init, this);
+		this.initAllCharacters();
+	},
+	
+	initAllCharacters: function() {
+		var names = ['celes', 'cyan', 'edgar', 'gau', 'gogo', 'locke', 'mog', 'relm', 'sabin', 'setzer', 'shadow', 'strago', 'terra', 'umaro'];
+		var spritePath = '/modules/wes/img/sprites/players';
+		var numNames = names.length;
+		this.characters = [];
+		for (var i = 0; i < numNames; i++) {
+			var minDamage = Math.random() * 10;
+			var maxDamage = minDamage + Math.random() * 10;
+			var weapon = new Game.gear.Weapon({
+				minDamage: minDamage,
+				maxDamage: maxDamage
+			});
+			this.characters.push(new Game.sprite.Character({
+				name: names[i],
+				x: Math.random() * 600,
+				y: Math.random() * 400,
+				width: 32,
+				height: 48,
+				life: 50,
+				maxLife: 50,
+				mana: 25,
+				maxMana: 25,
+				speed: Math.random() * 19 + 1,
+				src: spritePath + '/' + names[i] + '.png'
+			}));
+			this.characters[this.characters.length-1].equip(weapon, 'rightHand');
+		}
 	},
 	
 	init: function() {
@@ -52,6 +83,12 @@ Ext.define('Game.game.Game', {
 		window.game = this;
 		this.initSprites();
 		this.initGameLoop();
+	},
+	
+	battle: function() {
+		new Game.battle.Battle({
+			game: this
+		});
 	},
 	
 	initSockets: function() {
@@ -152,18 +189,8 @@ Ext.define('Game.game.Game', {
 	},
 	
 	initPlayer: function() {
-		this.player = new Game.sprite.Character({
-			name: 'Mog',
-			x: 0,
-			y: 0,
-			width: 32,
-			height: 48,
-			life: 50,
-			maxLife: 50,
-			mana: 25,
-			maxMana: 25,
-			src: '/modules/wes/img/sprites/players/mog.png'
-		});
+		var randomInt = Math.round(Math.random() * this.characters.length - 1);
+		this.player = this.characters[randomInt];
 		this.player.acceptInput(this.getDeviceInput());
 		window.player = this.player;
 	},

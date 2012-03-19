@@ -21,7 +21,12 @@ Ext.define('Game.sprite.Character', {
 		luck: 1,
 		speed: 1,
 		equipment: null,
-		inventory: null
+		inventory: null,
+		
+		atb: 0,
+		atbFull: false,
+		atbStart: 0,
+		atbStartDate: null
 	},
 	
 	constructor: function(config) {
@@ -88,7 +93,10 @@ Ext.define('Game.sprite.Character', {
 				x: originalX,
 				y: originalY
 			}
-		});
+		}).on('stop', function() {
+			this.fireEvent('actionfinish', this);
+		}, this);
+		return damage;
 	},
 	
 	showDamageText: function(damage, target) {
@@ -133,7 +141,9 @@ Ext.define('Game.sprite.Character', {
 	},
 	
 	die: function() {
-		this.life = this.maxLife;
+		this.fireEvent('die', this);
+		this.createAndPlaySequence([13]);
+//		this.life = this.maxLife;
 	},
 	
 	onKeyDownSpace: function() {
@@ -364,6 +374,37 @@ Ext.define('Game.sprite.Character', {
 				}]);
 			}
 		}
+	},
+	
+	updateAtb: function(d) {
+		if (this.atbFull) {
+			
+		}
+		else {
+			var difference = d - this.atbStartDate;
+			this.atb = difference / (100 - this.speed * 5);
+			if (this.atb >= 100) {
+				this.atbFull = true;
+				this.atb = 100;
+				this.fireEvent('atbfull', this);
+			}
+		}
+		
+			
+		
+	},
+	
+	resetAtb: function(d) {
+		this.atb = 0;
+		this.atbFull = false;
+		this.atbStartDate = d;
+	},
+	
+	draw: function() {
+		this.callParent(arguments);
+		this.context.fillStyle = '#ffffff';
+		this.context.font = '10pt Calibri';
+		this.context.fillText(this.life + '/' + this.maxLife + ' ' + Math.round(this.atb), this.x, this.y + this.height + 10);
 	}
 	
 });

@@ -1,19 +1,12 @@
 Ext.define('Game.ui.Debug', {
-	extend: 'Game.canvas.Canvas',
+	extend: 'Game.ui.Base',
 	
 	config: {
 		
 	},
 	
-	constructor: function() {
-		this.callParent(arguments);
-		this.camera = this.game.camera;
-	},
-	
-	draw: function() {
+	drawUi: function() {
 		var player = this.game.player;
-		this.context.save();
-		this.context.translate(this.camera.x, this.camera.y);
 		
 		var x = 10;
 		var y = 28;
@@ -37,8 +30,8 @@ Ext.define('Game.ui.Debug', {
 		y+= lineHeight;
 		this.context.fillText('Mana: ' + player.mana + '/' + player.maxMana, x, y);
 		y+= lineHeight;
-		
-		this.context.restore();
+		this.context.fillText('ATB: ' + player.atb, x, y);
+		y+= lineHeight;
 	}
 	
 });

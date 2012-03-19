@@ -55,6 +55,12 @@ Ext.define('Game.sprite.Sprite', {
 			if (this.motion) {
 				this.currentFrame = this.sequence.getFrame(this.motion.motionElapsedTime, this.getSequenceDurationFactor());
 			}
+			else if (this.sequence.numFrames == 1) {
+				this.currentFrame = this.sequence.sequence[0];
+			}
+			else {
+				this.currentFrame = this.sequence.getFrame((new Date()).getTime());
+			}
 			this.context.drawImage(this.img.dom, this.currentFrame * this.width, 0, this.width, this.height, this.x, this.y, this.width, this.height);
 		}
 	},
