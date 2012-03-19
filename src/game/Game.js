@@ -46,8 +46,8 @@ Ext.define('Game.game.Game', {
 		var numNames = names.length;
 		this.characters = [];
 		for (var i = 0; i < numNames; i++) {
-			var minDamage = Math.random() * 10;
-			var maxDamage = minDamage + Math.random() * 10;
+			var minDamage = Math.random() * 15;
+			var maxDamage = minDamage + Math.random() * 20;
 			var weapon = new Game.gear.Weapon({
 				minDamage: minDamage,
 				maxDamage: maxDamage

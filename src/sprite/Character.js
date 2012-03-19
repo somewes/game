@@ -84,7 +84,7 @@ Ext.define('Game.sprite.Character', {
 				y: target.y - 150
 			}
 		}).on('stop', function() {
-			target.receiveDamage(damage);
+			target.receiveDamage(damage, this);
 		}, this);
 		
 		this.animate({
@@ -131,18 +131,18 @@ Ext.define('Game.sprite.Character', {
 		return damage;
 	},
 	
-	receiveDamage: function(damage) {
+	receiveDamage: function(damage, attacker) {
 		this.showDamageText(damage, this);
 		this.life -= damage;
-		if (this.life < 0) {
+		this.life = Math.round(this.life);
+		if (this.life <= 0) {
 			this.life = 0;
-			this.die();
+			this.die(attacker);
 		}
 	},
 	
-	die: function() {
-		this.fireEvent('die', this);
-		this.createAndPlaySequence([13]);
+	die: function(attacker) {
+		this.fireEvent('die', this, attacker);
 //		this.life = this.maxLife;
 	},
 	

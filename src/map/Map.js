@@ -38,10 +38,12 @@ Ext.define('Game.map.Map', {
 	
 	addSprite: function(sprite) {
 		sprite.initGame(this.game);
-		sprite.on('remove', function(sprite) {
-			this.sprites.remove(sprite);
-		}, this);
+		sprite.on('remove', this.removeSprite, this);
 		this.sprites.add(sprite.getId(), sprite);
+	},
+	
+	removeSprite: function(sprite) {
+		this.sprites.remove(sprite);
 	},
 	
 	draw: function() {
