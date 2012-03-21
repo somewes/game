@@ -5,6 +5,7 @@ Ext.define('Game.animation.Animation', {
 		duration: 1000,
 		target: null,
 		to: {},
+		from: {},
 		scope: this,
 		easing: Ext.fx.Easing.linear,
 		onStop: false,
@@ -42,8 +43,8 @@ Ext.define('Game.animation.Animation', {
 	},
 	
 	calculateValues: function() {
-		this.startX = this.target.getX();
-		this.startY = this.target.getY();
+		this.startX = this.from.x != null ? this.from.x : this.target.getX();
+		this.startY = this.from.y != null ? this.from.y : this.target.getY();
 		this.startWidth = this.target.getWidth();
 		this.startHeight = this.target.getHeight();
 		

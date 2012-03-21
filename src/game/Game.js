@@ -46,14 +46,14 @@ Ext.define('Game.game.Game', {
 		var numNames = names.length;
 		this.characters = [];
 		for (var i = 0; i < numNames; i++) {
-			var minDamage = Math.random() * 15;
-			var maxDamage = minDamage + Math.random() * 20;
+			var minDamage = 10;
+			var maxDamage = 20;
 			var weapon = new Game.gear.Weapon({
 				minDamage: minDamage,
 				maxDamage: maxDamage
 			});
 			this.characters.push(new Game.sprite.Character({
-				name: names[i],
+				name: names[i].substr(0, 1).toUpperCase() + names[i].substr(1),
 				x: Math.random() * 600,
 				y: Math.random() * 400,
 				width: 32,
@@ -62,7 +62,8 @@ Ext.define('Game.game.Game', {
 				maxLife: 50,
 				mana: 25,
 				maxMana: 25,
-				speed: Math.random() * 19 + 1,
+				speed: 5,
+				gp: 20,
 				src: spritePath + '/' + names[i] + '.png'
 			}));
 			this.characters[this.characters.length-1].equip(weapon, 'rightHand');
@@ -85,10 +86,16 @@ Ext.define('Game.game.Game', {
 		this.initGameLoop();
 	},
 	
-	battle: function() {
-		new Game.battle.Battle({
+	makeBattle: function() {
+		this.battle = new Game.battle.Battle({
 			game: this
 		});
+		this.battle.start();
+		this.battle.on('finish', function(battle) {
+			this.battle.reset();
+			this.battle.init();
+			this.battle.start();
+		}, this);
 	},
 	
 	initSockets: function() {
@@ -155,8 +162,8 @@ Ext.define('Game.game.Game', {
 		}
 		else {
 			this.setMap(new Game.map.Debug2({
-				width: 1000,
-				height: 1000,
+				width: 640,
+				height: 480,
 				game: this,
 				hidden: false
 			}));
@@ -191,6 +198,7 @@ Ext.define('Game.game.Game', {
 	initPlayer: function() {
 		var randomInt = Math.round(Math.random() * this.characters.length - 1);
 		this.player = this.characters[randomInt];
+		this.player = this.characters[8];
 		this.player.acceptInput(this.getDeviceInput());
 		window.player = this.player;
 	},

@@ -5,7 +5,8 @@ Ext.define('Game.sprite.DamageText', {
 		color: '#000000',
 		damage: 0,
 		width: 200,
-		height: 50
+		height: 50,
+		textSize: 16
 	},
 	
 	constructor: function(config) {
@@ -27,7 +28,7 @@ Ext.define('Game.sprite.DamageText', {
 		if (!this.hidden) {
 			var context = this.getContext();
 			context.fillStyle = this.color;
-			context.font = '18pt Calibri';
+			context.font = this.textSize + 'pt Calibri';
 			context.fillText(this.damage, this.x, this.y);
 		}
 	}

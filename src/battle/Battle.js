@@ -1,7 +1,8 @@
 Ext.define('Game.battle.Battle', {
 	extend: 'Ext.util.Observable',
 	requires: [
-		'Game.battle.ui.Battle'
+		'Game.battle.ui.Battle',
+		'Game.character.Party'
 	],
 	
 	config: {
@@ -15,13 +16,14 @@ Ext.define('Game.battle.Battle', {
 	
 	constructor: function(config) {
 		this.initConfig(config);
-		this.actionQueue = [];
 		this.callParent(arguments);
 		this.init();
-		this.start();
 	},
 	
 	init: function() {
+		this.sprites = new Ext.util.MixedCollection();
+		this.parties = [];
+		this.actionQueue = [];
 		this.initMap();
 		this.initParties();
 		this.initUi()
@@ -29,10 +31,10 @@ Ext.define('Game.battle.Battle', {
 	
 	updateBattle: function() {
 		var d = (new Date()).getTime();
-		var numSprites = this.sprites.length;
+		var numSprites = this.sprites.items.length;
 		for (var i = 0; i < numSprites; i++) {
-			if (this.sprites[i].life > 0) {
-				this.sprites[i].updateAtb(d);
+			if (this.sprites.items[i].life > 0) {
+				this.sprites.items[i].updateAtb(d);
 			}
 		}
 	},
@@ -41,31 +43,123 @@ Ext.define('Game.battle.Battle', {
 		
 	},
 	
+	createParty: function() {
+		var party = new Game.character.Party();
+		party.on({
+			scope: this,
+			characteradd: this.onCharacterAdd,
+			characterremove: this.onCharacterRemove
+		})
+		this.parties.push(party);
+		return party;
+	},
+	
+	onCharacterAdd: function(party, character) {
+		this.sprites.add(character.getId(), character);
+	},
+	
+	onCharacterRemove: function(party, character) {
+		this.sprites.remove(character);
+	},
+	
 	initParties: function() {
-		this.parties = [];
-		this.sprites = [];
-		var i = 0;
-		this.sprites.push(this.game.player);
-		for (var i = 0; i < this.game.characters.length; i++) {
-//		for (var i = 0; i < 1; i++) {
-			if (this.game.characters[i].id != this.game.player.id) {
-				this.sprites.push(this.game.characters[i]);
-				this.game.map.removeSprite(this.game.characters[i]);
-				this.game.map.addSprite(this.game.characters[i]);
+		var totalParties = 2;
+		var totalCharacters = 6;
+		
+		// Create parties
+		for (var i = 0; i < totalParties; i++) {
+			this.createParty();
+		}
+		
+		// Put characters in parties
+		for (var i = 0; i < totalCharacters; i++) {
+			var partyIndex = Math.floor(Math.random() * totalParties);
+			this.parties[partyIndex].addCharacter(this.game.characters[i]);
+		}
+		
+		// Balance teams
+		var minPerParty = Math.floor(totalCharacters / totalParties);
+		var maxPerParty = Math.ceil(totalCharacters / totalParties);
+		for (var i = 0; i < totalParties; i++) {
+			while (this.parties[i].characters.items.length > maxPerParty) {
+				// Party has too many, start distributing to any party with less
+				for (var j = 0; j < totalParties; j++) {
+					if (this.parties[j].characters.items.length < minPerParty) {
+						var character = this.parties[i].characters.items[this.parties[i].characters.items.length-1];
+						this.parties[i].removeCharacter(character);
+						this.parties[j].addCharacter(character);
+					}
+				}
 			}
 		}
 		
-		var numSprites = this.sprites.length;
+//		this.parties[0].addCharacter(this.game.player);
+		
+		// Add sprites to map
+		var numSprites = this.sprites.items.length;
 		for (var i = 0; i < numSprites; i++) {
-			this.sprites[i].un('atbfull', this.onAtbFull);
-			this.sprites[i].un('die', this.onDie);
-			this.sprites[i].on('atbfull', this.onAtbFull, this);
-			this.sprites[i].on('die', this.onDie, this);
+			this.game.map.removeSprite(this.sprites.items[i]);
+			this.game.map.addSprite(this.sprites.items[i]);
+		}
+		
+		// Position parties
+		var numParties = this.parties.length;
+		for (var i = 0; i < numParties; i++) {
+			var baseX = 50;
+			var baseY = 200;
+			if (i) {
+				baseX = 500;
+			}
+			
+			var party = this.parties[i];
+			var numCharacters = party.characters.items.length;
+			for (var j = 0; j < numCharacters; j++) {
+				var x = baseX + j * 5;
+				var y = baseY + j * 60;
+				party.characters.items[j].animate({
+					duration: 400,
+					from: {
+						x: 0,
+						y: 0
+					},
+					to: {
+						x: x,
+						y: y
+					},
+					bezier: {
+						x: party.characters.items[j].x + (x - party.characters.items[j].x) * .9,
+						y: y - 150
+					}
+				});
+			}
+		}
+		
+		this.registerSpriteListeners();
+	},
+	
+	registerSpriteListeners: function() {
+		var numSprites = this.sprites.items.length;
+		for (var i = 0; i < numSprites; i++) {
+			this.sprites.items[i].on('atbfull', this.onAtbFull, this);
+			this.sprites.items[i].on('die', this.onDie, this);
+			this.sprites.items[i].on('levelup', this.onLevelUp, this);
+			this.sprites.items[i].on('receivedamage', this.onReceiveDamage, this);
+		}
+	},
+	
+	unregisterSpriteListeners: function() {
+		var numSprites = this.sprites.items.length;
+		for (var i = 0; i < numSprites; i++) {
+			this.sprites.items[i].un('atbfull', this.onAtbFull);
+			this.sprites.items[i].un('die', this.onDie);
+			this.sprites.items[i].un('actionfinish', this.onActionFinish);
+			this.sprites.items[i].un('levelup', this.onLevelUp);
+			this.sprites.items[i].un('receivedamage', this.onReceiveDamage);
 		}
 	},
 	
 	onAtbFull: function(character) {
-//			console.log(character.name + ' is full');
+//		console.log(character.name + ' is full');
 		if (character.life <= 0) {
 			return;
 		}
@@ -90,18 +184,91 @@ Ext.define('Game.battle.Battle', {
 	onDie: function(character, attacker) {
 		console.log(attacker.name + ' killed ' + character.name);
 		character.createAndPlaySequence([13]);
+		attacker.on('actionfinish', function() {
+			attacker.gainExp(character.giveExp());
+		}, this, {
+			single: true
+		});
+	},
+	
+	onLevelUp: function(character) {
+		character.playSequence(new Game.sprite.Sequence({
+			sequence: [10]
+		}));
+		setTimeout(Ext.bind(function(character) {
+			if (character.isAlive()) {
+				character.playSequence(new Game.sprite.Sequence({
+					sequence: [0]
+				}));
+			}
+		}, this, [
+			character
+		]), 1000);
+	},
+	
+	onReceiveDamage: function(character, damage) {
+		this.showDamageText(damage, character);
+		character.playAndRestore(new Game.sprite.Sequence({
+			sequence: [11]
+		}), 500);
+	},
+	
+	showDamageText: function(damage, target) {
+		
+		var maxDamage = 10000;
+		var damagePercent = damage / maxDamage;
+		
+		var minTextSize = 16;
+		var maxTextSize = 32;
+		var textSize = Math.round(minTextSize + (maxTextSize - minTextSize) * damagePercent);
+		var minYVelocity = 3;
+		var maxYVelocity = 8;
+		var yVelocity = -Math.round(minYVelocity + (maxYVelocity - minYVelocity) * damagePercent);
+		
+		var damageText = new Game.sprite.DamageText({
+			damage: damage,
+			following: target,
+			x: target.x,
+			y: target.y,
+			textSize: textSize
+		});
+		this.game.map.addSprite(damageText);
+
+		var xVelocity = target.randy(-5, 5);
+		damageText.startMotion({
+			xVelocity: xVelocity,
+			xAcceleration: -xVelocity*1.5,
+			xVelocityStop: 0,
+			yVelocity: yVelocity,
+			yAcceleration: -yVelocity*3,
+			yStop: target.y
+//				xStop: target.x + xVelocity*5
+		}).on('stop', function(motion) {
+			motion.target.remove();
+		}, this);
 	},
 	
 	getRandomEnemy: function(character) {
-		var randomInt = Math.round(character.randy(0, this.sprites.length - 1));
-		var enemy = this.sprites[randomInt];
+		// Get another party
+		var numParties = this.parties.length;
+		var enemyParty = false;
+		for (var i = 0; i < numParties; i++) {
+			if (character.party != this.parties[i]) {
+				enemyParty = this.parties[i];
+				break;
+			}
+		}
+		
+		// Get random enemy from party
+		var randomInt = Math.round(character.randy(0, enemyParty.characters.items.length - 1));
+		var enemy = enemyParty.characters.items[randomInt];
 		if (enemy.id != character.id && enemy.life > 0) {
 			return enemy;
 		}
 		else {
-			for (var i = 0; i < this.sprites.length; i++) {
-				var newIndex = (randomInt + i) % this.sprites.length;
-				enemy = this.sprites[newIndex];
+			for (var i = 0; i < enemyParty.characters.items.length; i++) {
+				var newIndex = (randomInt + i) % enemyParty.characters.items.length;
+				enemy = enemyParty.characters.items[newIndex];
 				if (enemy.id != character.id && enemy.life > 0) {
 					return enemy;
 				}
@@ -125,20 +292,8 @@ Ext.define('Game.battle.Battle', {
 		if (this.queueRunning === false && this.actionQueue.length) {
 			this.queueRunning = true;
 			if (this.actionQueue[0].character.life > 0) {
-				this.actionQueue[0].character.on('actionfinish', function(character) {
-					// Check if there is a winner
-					if (this.queueRunning === false) {
-//						console.log('already a winner');
-						return;
-					}
-//					console.log('not a winner play first frame');
-					character.createAndPlaySequence([0]);
-					this.actionQueue.splice(0, 1);
-					this.queueRunning = false;
-					var d = (new Date()).getTime();
-					character.resetAtb(d);
-					this.runNextAction();
-				}, this, {
+				this.pauseAtb();
+				this.actionQueue[0].character.on('actionfinish', this.onActionFinish, this, {
 					single: true
 				});
 				this.actionQueue[0].character.createAndPlaySequence([10]);
@@ -152,25 +307,48 @@ Ext.define('Game.battle.Battle', {
 		}
 	},
 	
+	onActionFinish: function(character) {
+		// Check if there is a winner
+		this.resumeAtb();
+		if (this.queueRunning === false) {
+			return;
+		}
+		character.createAndPlaySequence([0]);
+		this.actionQueue.splice(0, 1);
+		this.queueRunning = false;
+		var d = (new Date()).getTime();
+		character.resetAtb(d);
+		this.runNextAction();
+	},
+	
 	checkWinCondition: function() {
-		var numSprites = this.sprites.length;
-		var numSpritesAlive = 0;
+		var numParties = this.parties.length;
+		var numPartiesAlive = 0;
 		var winner = false;
-		for (var i = 0; i < numSprites; i++) {
-			if (this.sprites[i].life > 0) {
-				winner = this.sprites[i];
-				numSpritesAlive++;
+		for (var i = 0; i < numParties; i++) {
+			var numCharacters = this.parties[i].characters.items.length;
+			for (var j = 0; j < numCharacters; j++) {
+				if (this.parties[i].characters.items[j].life > 0) {
+					numPartiesAlive++;
+					winner = this.parties[i];
+					break;
+				}
 			}
 		}
-		if (numSpritesAlive == 1) {
-			console.log(winner.name + ' wins');
-			this.finish();
-			winner.playSequence(new Game.sprite.Sequence({
-				sequence: [6, 7],
-				duration: 1000
-			}));
-			setTimeout(Ext.bind(this.reset, this), 5000);
-			return winner;
+		
+		if (numPartiesAlive == 1) {
+			this.stop();
+			var numCharacters = winner.characters.items.length;
+			for (var i = 0; i < numCharacters; i++) {
+				if (winner.characters.items[i].life > 0) {
+					winner.characters.items[i].playSequence(new Game.sprite.Sequence({
+						sequence: [6, 7],
+						duration: 1000
+					}));
+				}
+			}
+			setTimeout(Ext.bind(this.finish, this), 2000);
+			return true;
 		}
 		return false;
 	},
@@ -184,26 +362,48 @@ Ext.define('Game.battle.Battle', {
 	start: function() {
 		this.ui.hidden = false;
 		var d = (new Date()).getTime();
-		var numSprites = this.sprites.length;
+		var numSprites = this.sprites.items.length;
 		for (var i = 0; i < numSprites; i++) {
-			this.sprites[i].resetAtb(d);
+			this.sprites.items[i].startAtbAction(1000, 4000);
+			this.sprites.items[i].resetAtb(d);
 		}
 		this.updateInterval = setInterval(Ext.bind(this.updateBattle, this), 1000 / this.game.getTargetFps());
 	},
 	
-	finish: function() {
+	stop: function() {
+		this.unregisterSpriteListeners();
 		clearInterval(this.updateInterval);
 		this.actionQueue = [];
 		this.queueRunning = false;
 	},
 	
-	reset: function() {
-		var numSprites = this.sprites.length;
-		for (var i = 0; i < numSprites; i++) {
-			this.sprites[i].life = this.sprites[i].maxLife;
-			this.sprites[i].createAndPlaySequence([0]);
+	pauseAtb: function() {
+		clearInterval(this.updateInterval);
+		this.updateInterval = false;
+	},
+	
+	resumeAtb: function() {
+		if (this.updateInterval) {
+			return;
 		}
-		this.start();
+		var d = (new Date()).getTime();
+		var numSprites = this.sprites.items.length;
+		for (var i = 0; i < numSprites; i++) {
+			this.sprites.items[i].resumeAtb(d);
+		}
+		this.updateInterval = setInterval(Ext.bind(this.updateBattle, this), 1000 / this.game.getTargetFps());
+	},
+	
+	finish: function() {
+		this.fireEvent('finish', this);
+	},
+	
+	reset: function() {
+		var numSprites = this.sprites.items.length;
+		for (var i = 0; i < numSprites; i++) {
+			this.sprites.items[i].life = this.sprites.items[i].maxLife;
+			this.sprites.items[i].createAndPlaySequence([0]);
+		}
 	}
 	
 });

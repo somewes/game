@@ -8,11 +8,14 @@ Ext.define('Game.sprite.Sprite', {
 		img: null,
 		src: false,
 		hidden: false,
-		currentFrame: 0
+		currentFrame: 0,
+		sequences: null,
+		restoreTimeout: null
 	},
 	
 	constructor: function() {
 		this.callParent(arguments);
+		this.sequences = [];
 		this.createAndPlaySequence([0]);
 		
 		this.img = Ext.get(new Image());
@@ -73,6 +76,17 @@ Ext.define('Game.sprite.Sprite', {
 	
 	playSequence: function(sequence) {
 		this.sequence = sequence;
+		clearTimeout(this.restoreTimeout);
+	},
+	
+	playAndRestore: function(sequence, duration) {
+		this.sequences.push(this.sequence);
+		this.playSequence(sequence);
+		this.restoreTimeout = setTimeout(Ext.bind(this.restoreSequence, this), duration);
+	},
+	
+	restoreSequence: function() {
+		this.playSequence(this.sequences.pop());
 	}
 	
 });

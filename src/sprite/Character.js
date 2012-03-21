@@ -10,6 +10,7 @@ Ext.define('Game.sprite.Character', {
 	config: {
 		name: '',
 		level: 1,
+		exp: 0,
 		life: 1,
 		maxLife: 1,
 		mana: 1,
@@ -26,7 +27,11 @@ Ext.define('Game.sprite.Character', {
 		atb: 0,
 		atbFull: false,
 		atbStart: 0,
-		atbStartDate: null
+		atbStartDate: null,
+		atbElapsed: 0,
+		
+		gp: 0,
+		row: 0
 	},
 	
 	constructor: function(config) {
@@ -38,6 +43,53 @@ Ext.define('Game.sprite.Character', {
 		this.inventory = new Game.Inventory({
 			character: this
 		});
+	},
+	
+	getExpToLevel: function(level) {
+		return level * level * level + 5;
+	},
+	
+	levelUp: function() {
+		console.log(this.name + ' leveled up!');
+		this.level++;
+		var moreLife = Math.round(this.randy(this.level + this.vitality * 2, this.level + this.vitality * 2 + this.vitality));
+		console.log('Life: ' + this.maxLife + ' -> ' + (this.maxLife + moreLife));
+		this.maxLife += moreLife;
+		this.life = this.maxLife;
+		
+		var moreMana = Math.round(this.randy(3, 3 + this.level / 2));
+		console.log('Mana: ' + this.maxMana + ' -> ' + (this.maxMana + moreMana));
+		this.maxMana += moreMana;
+		this.mana = this.maxMana;
+		
+		this.strength += 1;
+		this.vitality += 1;
+		this.speed += 1;
+		console.log('Strength: ' + (this.strength - 1) + ' -> ' + this.strength);
+		console.log('Vitality: ' + (this.vitality - 1) + ' -> ' + this.vitality);
+		console.log('Speed: ' + (this.speed - 1) + ' -> ' + this.speed);
+		this.fireEvent('levelup', this);
+	},
+	
+	gainExp: function(exp) {
+		this.exp += exp;
+		console.log(this.name + ' gained ' + exp + ' exp');
+		while (this.exp >= this.getExpToLevel(this.level)) {
+			this.levelUp();
+		}
+		console.log(this.getExpToGo() + ' to go');
+	},
+	
+	getExpToGo: function() {
+		return this.getExpToLevel(this.level) - this.exp;
+	},
+	
+	giveExp: function() {
+		return this.level * 2;
+	},
+	
+	isAlive: function() {
+		return this.life > 0;
 	},
 	
 	equip: function(item, slot) {
@@ -65,14 +117,17 @@ Ext.define('Game.sprite.Character', {
 	
 	attack: function(target) {
 //		console.log(this.name + ' attacked ' + target.name);
-		var damage = this.equipment.getWeapon().getDamage();
+		var damage = this.equipment.getWeapon().getDamage() + this.strength * 2 + this.level;
 		damage = target.defend(damage)
-		
 		var originalX = this.x;
 		var originalY = this.y;
 		
 		var distance = this.getDistance({x: this.x, y: this.y}, {x: target.x, y: target.y});
+		if (distance <= 1) {
+			distance = 1;
+		}
 		var duration = Math.log(distance) * 100;
+		duration = 300;
 		this.animate({
 			duration: duration,
 			to: {
@@ -99,30 +154,6 @@ Ext.define('Game.sprite.Character', {
 		return damage;
 	},
 	
-	showDamageText: function(damage, target) {
-		var damageText = new Game.sprite.DamageText({
-			damage: damage,
-			following: target,
-			x: target.x,
-			y: target.y
-		});
-		this.game.map.addSprite(damageText);
-
-		var xVelocity = this.randy(-5, 5);
-		var yVelocity = -damage;
-		damageText.startMotion({
-			xVelocity: xVelocity,
-			xAcceleration: -xVelocity*3,
-			xVelocityStop: 0,
-			yVelocity: yVelocity,
-			yAcceleration: -yVelocity*3,
-			yStop: target.y
-//				xStop: target.x + xVelocity*5
-		}).on('stop', function(motion) {
-			motion.target.remove();
-		}, this);
-	},
-	
 	defend: function(damage) {
 //		console.log('Damage started at ' + damage);
 		damage -= damage * this.strength / 100;
@@ -132,9 +163,9 @@ Ext.define('Game.sprite.Character', {
 	},
 	
 	receiveDamage: function(damage, attacker) {
-		this.showDamageText(damage, this);
 		this.life -= damage;
 		this.life = Math.round(this.life);
+		this.fireEvent('receivedamage', this, damage);
 		if (this.life <= 0) {
 			this.life = 0;
 			this.die(attacker);
@@ -381,8 +412,13 @@ Ext.define('Game.sprite.Character', {
 			
 		}
 		else {
-			var difference = d - this.atbStartDate;
-			this.atb = difference / (100 - this.speed * 5);
+			this.atbElapsed += d - this.atbStartDate;
+			this.atbStartDate = d;
+			var operationTime = 10000;
+			var maxSpeed = 100;
+			var operationTime = this.atbMaxTime - ((this.atbMaxTime - this.atbMinTime) * this.speed / maxSpeed);
+//			operationTime -= (operationTime - 1000) * this.speed / maxSpeed;
+			this.atb = this.atbElapsed / operationTime * 100;
 			if (this.atb >= 100) {
 				this.atbFull = true;
 				this.atb = 100;
@@ -390,13 +426,21 @@ Ext.define('Game.sprite.Character', {
 			}
 		}
 		
-			
-		
+	},
+	
+	startAtbAction: function(minTime, maxTime) {
+		this.atbMinTime = minTime;
+		this.atbMaxTime = maxTime;
 	},
 	
 	resetAtb: function(d) {
 		this.atb = 0;
+		this.atbElapsed = 0;
 		this.atbFull = false;
+		this.atbStartDate = d;
+	},
+	
+	resumeAtb: function(d) {
 		this.atbStartDate = d;
 	},
 	
@@ -404,7 +448,7 @@ Ext.define('Game.sprite.Character', {
 		this.callParent(arguments);
 		this.context.fillStyle = '#ffffff';
 		this.context.font = '10pt Calibri';
-		this.context.fillText(this.life + '/' + this.maxLife + ' ' + Math.round(this.atb), this.x, this.y + this.height + 10);
+		this.context.fillText('L: ' + this.level + ' HP: ' + this.life + '/' + this.maxLife + ' Next: ' + this.getExpToGo() + ' ' + Math.round(this.atb), this.x, this.y + this.height + 10);
 	}
 	
 });
