@@ -1,0 +1,6 @@
+{
+	"name": "game",
+	"version": "0.0.1",
+	"display": "Game",
+	"description": "2d game framework modules for lapidos"
+}
