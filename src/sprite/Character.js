@@ -29,6 +29,8 @@ Ext.define('Game.sprite.Character', {
 		atbStart: 0,
 		atbStartDate: null,
 		atbElapsed: 0,
+		autoBattle: true,
+		queuedAction: false,
 		
 		gp: 0,
 		row: 0
@@ -46,13 +48,16 @@ Ext.define('Game.sprite.Character', {
 	},
 	
 	getExpToLevel: function(level) {
-		return level * level * level + 5;
+		if (level) {
+			return level * level * level + 5;
+		}
+		return 0;
 	},
 	
 	levelUp: function() {
 		console.log(this.name + ' leveled up!');
 		this.level++;
-		var moreLife = Math.round(this.randy(this.level + this.vitality * 2, this.level + this.vitality * 2 + this.vitality));
+		var moreLife = Math.round(this.randy(this.level + this.vitality * 0.9, this.level + this.vitality * 1.1));
 		console.log('Life: ' + this.maxLife + ' -> ' + (this.maxLife + moreLife));
 		this.maxLife += moreLife;
 		this.life = this.maxLife;
@@ -113,45 +118,6 @@ Ext.define('Game.sprite.Character', {
 	
 	getManaPercent: function() {
 		return this.mana / this.maxMana;
-	},
-	
-	attack: function(target) {
-//		console.log(this.name + ' attacked ' + target.name);
-		var damage = this.equipment.getWeapon().getDamage() + this.strength * 2 + this.level;
-		damage = target.defend(damage)
-		var originalX = this.x;
-		var originalY = this.y;
-		
-		var distance = this.getDistance({x: this.x, y: this.y}, {x: target.x, y: target.y});
-		if (distance <= 1) {
-			distance = 1;
-		}
-		var duration = Math.log(distance) * 100;
-		duration = 300;
-		this.animate({
-			duration: duration,
-			to: {
-				x: target.x,
-				y: target.y
-			},
-			bezier: {
-				x: this.x + (target.x - this.x) * .9,
-				y: target.y - 150
-			}
-		}).on('stop', function() {
-			target.receiveDamage(damage, this);
-		}, this);
-		
-		this.animate({
-			duration: duration/1.5,
-			to: {
-				x: originalX,
-				y: originalY
-			}
-		}).on('stop', function() {
-			this.fireEvent('actionfinish', this);
-		}, this);
-		return damage;
 	},
 	
 	defend: function(damage) {
@@ -444,11 +410,157 @@ Ext.define('Game.sprite.Character', {
 		this.atbStartDate = d;
 	},
 	
+	getAction: function(action, type) {
+		var methodName = 'do' + type + action;
+		return Ext.bind(this[methodName], this);
+	},
+	
+	dealDamage: function(target, modifier) {
+		if (target.isAlive()) {
+			modifier = modifier || 1;
+			var damage = this.equipment.getWeapon().getDamage() + this.strength * 2 + this.level;
+			damage *= modifier;
+			damage = target.defend(damage)
+			target.receiveDamage(damage, this);
+		}
+	},
+	
+	doDoubleAttack: function(target) {
+		var originalX = this.x;
+		var originalY = this.y;
+		
+		this.animate({
+			duration: 250,
+			to: {
+				x: target.x,
+				y: target.y
+			},
+			bezier: {
+				x: this.x + (target.x - this.x) * .9,
+				y: target.y - 150
+			}
+		}).on('stop', function() {
+			this.dealDamage(target);
+		}, this);
+		
+		this.animate({
+			duration: 500,
+			to: {
+				x: target.x,
+				y: target.y
+			},
+			bezier: {
+				x: this.x + (target.x - this.x) * .9,
+				y: target.y - 400
+			}
+		}).on('stop', function() {
+			this.dealDamage(target);
+		}, this);
+		
+		this.animate({
+			duration: 250,
+			to: {
+				x: originalX,
+				y: originalY
+			}
+		}).on('stop', function() {
+			this.fireEvent('actionfinish', this);
+		}, this);
+	},
+	
+	/*
+	 * Split damage evenly
+	 */
+	doSlashAttack: function(targets) {
+		var numTargets = targets.length;
+		var modifier = 1 / numTargets;
+		for (var i = 0; i < numTargets; i++) {
+			this.dealDamage(targets[i], modifier);
+		}
+		setTimeout(Ext.bind(function() {
+			this.fireEvent('actionfinish', this);
+		}, this), 1000);
+	},
+	
+	doBasicAttack: function(target) {
+		var originalX = this.x;
+		var originalY = this.y;
+		
+		var distance = this.getDistance({x: this.x, y: this.y}, {x: target.x, y: target.y});
+		if (distance <= 1) {
+			distance = 1;
+		}
+		var duration = Math.log(distance) * 100;
+		duration = 300;
+		this.animate({
+			duration: duration,
+			to: {
+				x: target.x,
+				y: target.y
+			},
+			bezier: {
+				x: this.x + (target.x - this.x) * .9,
+				y: target.y - 150
+			}
+		}).on('stop', function() {
+			this.dealDamage(target);
+		}, this);
+		
+		this.animate({
+			duration: duration/1.5,
+			to: {
+				x: originalX,
+				y: originalY
+			}
+		}).on('stop', function() {
+			this.fireEvent('actionfinish', this);
+		}, this);
+	},
+	
 	draw: function() {
 		this.callParent(arguments);
-		this.context.fillStyle = '#ffffff';
-		this.context.font = '10pt Calibri';
-		this.context.fillText('L: ' + this.level + ' HP: ' + this.life + '/' + this.maxLife + ' Next: ' + this.getExpToGo() + ' ' + Math.round(this.atb), this.x, this.y + this.height + 10);
+		
+		this.context.save();
+		this.context.translate(this.x, this.y);
+//		this.context.font = '10px Calibri';
+		this.context.font = '12px Arial';
+		
+		// Draw life
+		var barWidth = 100;
+		this.context.strokeStyle = 'rgb(255, 255, 255)';
+		this.context.fillStyle = 'rgb(255, 0, 0)';
+		this.context.strokeRect(40, 10, barWidth, 10);
+		this.context.fillRect(40, 10, this.life/this.maxLife*barWidth, 10);
+		this.context.fillStyle = 'rgb(255, 255, 255)';
+		this.context.fillText(this.life + '/' + this.maxLife, 44, 19);
+		
+		// Draw mana
+		this.context.fillStyle = 'rgb(0, 0, 255)';
+		this.context.strokeRect(40, 24, barWidth, 10);
+		this.context.fillRect(40, 24, this.mana/this.maxMana*barWidth, 10);
+		this.context.fillStyle = 'rgb(255, 255, 255)';
+		this.context.fillText(this.mana + '/' + this.maxMana, 44, 33);
+		
+		// Draw experience
+		this.context.fillStyle = 'rgb(0, 255, 0)';
+		this.context.strokeRect(40, 38, barWidth, 10);
+		var expToLevel = this.getExpToLevel(this.level);
+		var expLastLevel = this.getExpToLevel(this.level-1);
+		var levelPercent = (this.exp - expLastLevel) / (expToLevel - expLastLevel);
+		this.context.fillRect(40, 38, levelPercent*barWidth, 10);
+		this.context.fillStyle = 'rgb(0, 0, 0)';
+		this.context.fillText((this.exp - expLastLevel) + '/' + (expToLevel - expLastLevel), 44, 47);
+		
+		// Draw atb
+		this.context.fillStyle = 'rgb(255, 255, 255)';
+		this.context.strokeRect(40, 52, barWidth, 10);
+		this.context.fillRect(40, 52, this.atb/100*barWidth, 10);
+		
+		this.context.fillStyle = 'rgb(255, 255, 255)';
+		this.context.fillText('Lvl: ' + this.level, 0, this.height + 10);
+		
+		this.context.restore();
+		
 	}
 	
 });

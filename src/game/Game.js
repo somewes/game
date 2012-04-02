@@ -84,6 +84,7 @@ Ext.define('Game.game.Game', {
 		window.game = this;
 		this.initSprites();
 		this.initGameLoop();
+		this.makeBattle();
 	},
 	
 	makeBattle: function() {

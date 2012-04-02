@@ -17,7 +17,7 @@ Ext.define('Game.sprite.DamageText', {
 	
 	getColor: function() {
 		if (this.damage > 0) {
-			return '#ff0000';
+			return '#ffffff';
 		}
 		else {
 			return '#00ff00';

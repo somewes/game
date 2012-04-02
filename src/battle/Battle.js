@@ -64,34 +64,53 @@ Ext.define('Game.battle.Battle', {
 	
 	initParties: function() {
 		var totalParties = 2;
-		var totalCharacters = 6;
+		var totalCharacters = 8;
 		
 		// Create parties
 		for (var i = 0; i < totalParties; i++) {
 			this.createParty();
 		}
 		
-		// Put characters in parties
+		// Get sum of levels
+		var sumLevels = 0;
+		var sprites = [];
 		for (var i = 0; i < totalCharacters; i++) {
-			var partyIndex = Math.floor(Math.random() * totalParties);
-			this.parties[partyIndex].addCharacter(this.game.characters[i]);
+			sumLevels += this.game.characters[i].level;
+			sprites.push(this.game.characters[i]);
+		}
+		var averagePerParty = sumLevels / totalParties;
+		
+		// Sort by exp
+		sprites.sort(function(a, b) {
+			return b.exp - a.exp;
+		});
+		
+		// Put characters in parties based on levels
+		for (var i = 0; i < totalCharacters; i++) {
+			this.parties.sort(function(a, b) {
+				return a.getLevelSum() - b.getLevelSum();
+			});
+			this.parties[0].addCharacter(sprites[i]);
+//			var partyIndex = Math.floor(Math.random() * totalParties);
+//			this.parties[partyIndex].addCharacter(this.game.characters[i]);
 		}
 		
-		// Balance teams
-		var minPerParty = Math.floor(totalCharacters / totalParties);
-		var maxPerParty = Math.ceil(totalCharacters / totalParties);
-		for (var i = 0; i < totalParties; i++) {
-			while (this.parties[i].characters.items.length > maxPerParty) {
-				// Party has too many, start distributing to any party with less
-				for (var j = 0; j < totalParties; j++) {
-					if (this.parties[j].characters.items.length < minPerParty) {
-						var character = this.parties[i].characters.items[this.parties[i].characters.items.length-1];
-						this.parties[i].removeCharacter(character);
-						this.parties[j].addCharacter(character);
-					}
-				}
-			}
-		}
+		
+		// Balance teams by number of people
+//		var minPerParty = Math.floor(totalCharacters / totalParties);
+//		var maxPerParty = Math.ceil(totalCharacters / totalParties);
+//		for (var i = 0; i < totalParties; i++) {
+//			while (this.parties[i].characters.items.length > maxPerParty) {
+//				// Party has too many, start distributing to any party with less
+//				for (var j = 0; j < totalParties; j++) {
+//					if (this.parties[j].characters.items.length < minPerParty) {
+//						var character = this.parties[i].characters.items[this.parties[i].characters.items.length-1];
+//						this.parties[i].removeCharacter(character);
+//						this.parties[j].addCharacter(character);
+//					}
+//				}
+//			}
+//		}
 		
 //		this.parties[0].addCharacter(this.game.player);
 		
@@ -106,9 +125,9 @@ Ext.define('Game.battle.Battle', {
 		var numParties = this.parties.length;
 		for (var i = 0; i < numParties; i++) {
 			var baseX = 50;
-			var baseY = 200;
+			var baseY = 20;
 			if (i) {
-				baseX = 500;
+				baseX = 400;
 			}
 			
 			var party = this.parties[i];
@@ -163,22 +182,47 @@ Ext.define('Game.battle.Battle', {
 		if (character.life <= 0) {
 			return;
 		}
-		if (Math.random() > .5) {
-			character.createAndPlaySequence([4]);
+		if (character.queuedAction) {
+			if (Math.random() > .5) {
+				character.createAndPlaySequence([4]);
+			}
+			else {
+				character.playSequence(new Game.sprite.Sequence({
+					sequence: [8, 9],
+					duration: 300
+				}));
+			}
 		}
 		else {
-			character.playSequence(new Game.sprite.Sequence({
-				sequence: [8, 9],
-				duration: 300
-			}));
-		}
-		this.addAction(Ext.bind(function() {
-			var enemy = this.getRandomEnemy(character);
-			if (enemy) {
-				var damage = character.attack(enemy);
-//				console.log(character.name + ' is attacking ' + enemy.name + ' for ' + damage);
+			if (character.autoBattle) {
+				
+				var action;
+				var value = Math.floor(Math.random() * 10);
+				if (value < 4) {
+					action = character.getAction('Attack', 'Basic');
+					this.addAction(Ext.bind(function() {
+						action(this.getRandomEnemy(character));
+					}, this), character);
+				}
+				else if (value < 7) {
+					action = character.getAction('Attack', 'Slash');
+					this.addAction(Ext.bind(function() {
+						if (character.party == this.parties[0]) {
+							action(this.parties[1].characters.items);
+						}
+						else {
+							action(this.parties[0].characters.items);
+						}
+					}, this), character);
+				}
+				else {
+					action = character.getAction('Attack', 'Double');
+					this.addAction(Ext.bind(function() {
+						action(this.getRandomEnemy(character));
+					}, this), character);
+				}
 			}
-		}, this), character);
+		}
 	},
 	
 	onDie: function(character, attacker) {
@@ -277,7 +321,7 @@ Ext.define('Game.battle.Battle', {
 		return false;
 	},
 	
-	addAction: function(action, character) {
+	addAction: function(action, character, targetFn) {
 		this.actionQueue.push({
 			action: action,
 			character: character

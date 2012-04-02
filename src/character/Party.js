@@ -28,6 +28,15 @@ Ext.define('Game.character.Party', {
 		this.characters.remove(character);
 		delete character.party;
 		this.fireEvent('characterremove', this, character);
+	},
+	
+	getLevelSum: function() {
+		var sum = 0;
+		var numCharacters = this.characters.items.length;
+		for (var i = 0; i < numCharacters; i++) {
+			sum += this.characters.items[i].level;
+		}
+		return sum;
 	}
 	
 });
