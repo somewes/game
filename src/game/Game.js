@@ -77,6 +77,7 @@ Ext.define('Game.game.Game', {
 		this.initDeviceInput();
 		this.initCanvasManager();
 		this.initAnimationManager();
+		// this.initAudioManager();
 		this.initPlayer();
 		this.initMap();
 		this.initMainUi();
@@ -85,6 +86,88 @@ Ext.define('Game.game.Game', {
 		this.initSprites();
 		this.initGameLoop();
 		this.makeBattle();
+	},
+	
+	initAudioManager: function() {
+		var os = Lapidos.os.Manager.getDefaultOs();
+		var srcs = [
+			// '/03 - The Frail.mp3',
+			// '/04 - The Wretched.mp3',
+			// '/05 - We\'re In This Together.mp3',
+			// '/06 - The Fragile.mp3',
+			// '/07 - Just Like You Imagined.mp3',
+			// '/D1_03_Danse Caribe.mp3',
+			// '/D1_07_Near Death Experience Experience.mp3',
+			'01. Circuitry of the Wolf.mp3',
+			'02. Chinaberry Tree.mp3',
+			'03. Why Are You Looking Grave.mp3',
+			'04. Fox Cub.mp3',
+			'05. Apocalypso.mp3',
+			'06. Special.mp3',
+			'07. The Zookeeper\'s Boy.mp3',
+			'08. A Dark Design.mp3'
+		];
+		
+		this.audioManager = os.getAudioManager();
+		this.audioGroup = this.audioManager.createGroup('game');
+		this.channel = new Lapidos.audio.Channel({
+			name: 'Test',
+			mode: 'multi',
+			crossfade: true,
+			crossfadeDuration: 80
+		});
+		
+		this.channel.on('changeaudio', function(channel, audio) {
+			audio.on('fadefinish', function(audio) {
+				audio.fade(Math.random(), 2000);
+			}, this);
+			setTimeout(function() {
+				audio.seek(30);
+				audio.fade(0, 3000);
+				// audio.setVolume(0);
+				// audio.fade(.5, 5000);
+			}.bind(this), 2000);
+		}, this);
+		
+		for (var i = 0; i < 1; i++) {
+			this.channel.play(srcs[i], {
+				enqueue: true
+			});
+		}
+		
+		
+		
+		return;
+		
+		this.audioGroup.createChannels([
+			'background',
+			'fx'
+		]);
+		this.backgroundChannel = this.audioGroup.getChannel('background');
+		this.fxChannel = this.audioGroup.getChannel('fx');
+		
+		var audio = new Lapidos.audio.Audio({
+			src: srcs[1],
+			fadeoutDuration: 300
+		});
+		audio.play();
+		setTimeout(function() {
+			audio.pause();
+		}.bind(this), 1000);
+		
+		return;
+		var numSrcs = srcs.length;
+		for (var i = 1; i < numSrcs; i++) {
+			this.backgroundChannel.play(srcs[i], {
+				enqueue: true,
+				gapless: true
+			});
+		}
+		
+		setTimeout(function(){
+			this.backgroundChannel.fadeOut(300);
+		}.bind(this), 2000);
+		
 	},
 	
 	makeBattle: function() {

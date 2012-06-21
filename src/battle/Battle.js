@@ -252,6 +252,7 @@ Ext.define('Game.battle.Battle', {
 	
 	onReceiveDamage: function(character, damage) {
 		this.showDamageText(damage, character);
+//		this.game.fxChannel.play('/navi - hey.mp3');
 		character.playAndRestore(new Game.sprite.Sequence({
 			sequence: [11]
 		}), 500);
