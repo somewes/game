@@ -9,6 +9,7 @@ Ext.define('Game.module.Game', {
 	config: {
 		name: 'game',
 		title: 'Game',
+		icon: '/js/game/resources/img/game-32.png',
 		viewConfig: {
 			home: {
 				cls: 'Game.game.view.Interface'
