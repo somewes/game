@@ -1,4 +1,4 @@
-Ext.define('Game.Equipment', {
+Ext.define('Game.character.Equipment', {
 	extend: 'Ext.util.Observable',
 	requires: [
 		'Game.gear.Weapon'

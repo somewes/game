@@ -1,4 +1,4 @@
-Ext.define('Game.Inventory', {
+Ext.define('Game.character.Inventory', {
 	extend: 'Ext.util.Observable',
 	
 	config: {

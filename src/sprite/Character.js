@@ -1,8 +1,8 @@
 Ext.define('Game.sprite.Character', {
 	extend: 'Game.sprite.Sprite',
 	requires: [
-		'Game.Equipment',
-		'Game.Inventory',
+		'Game.character.Equipment',
+		'Game.character.Inventory',
 		'Game.sprite.DamageText',
 		'Game.sprite.Base'
 	],
@@ -39,10 +39,10 @@ Ext.define('Game.sprite.Character', {
 	constructor: function(config) {
 		this.initConfig(config);
 		this.callParent(arguments);
-		this.equipment = new Game.Equipment({
+		this.equipment = new Game.character.Equipment({
 			character: this
 		});
-		this.inventory = new Game.Inventory({
+		this.inventory = new Game.character.Inventory({
 			character: this
 		});
 	},
